@@ -1,3 +1,8 @@
+-- FILE: oracle_database.sql
+-- PURPOSE: Oracle-compatible database setup including tables and seed data
+
+
+
 -- =========================
 -- 1. GUEST TABLE
 -- =========================
