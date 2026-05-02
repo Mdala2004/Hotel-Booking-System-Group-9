@@ -1,3 +1,8 @@
+-- FILE: queries.sql
+-- PURPOSE: SQL queries based on rubric requirements
+
+
+
 -- =========================================
 -- BASIC QUERIES
 -- =========================================
