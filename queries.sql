@@ -163,3 +163,20 @@ FROM reservations r
 JOIN guest g ON r.GUEST_ID = g.GUEST_ID
 JOIN payments p ON r.RESERVATION_ID = p.RESERVATION_ID
 WHERE p.PAYMENT_STATUS = 'Paid';
+
+-- =========================================
+-- ADDITIONAL RUBRIC FIXES
+-- =========================================
+
+-- FETCH FIRST ROWS
+SELECT *
+FROM guest
+FETCH FIRST 3 ROWS ONLY;
+
+-- TRUNCATION
+SELECT TRUNC(AVG(PRICE_PER_NIGHT), 0)
+FROM room;
+
+SELECT RESERVATION_ID,
+       ROUND(CHECK_OUT_DATE - CHECK_IN_DATE) AS STAY_DAYS
+FROM reservations;
