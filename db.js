@@ -11,7 +11,7 @@ async function initPool() {
     pool = await oracledb.createPool({
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      connectString: process.env.DB_CONNECTION_STRING,
+      connectString: process.env.DB_CONNECT_STRING,
       poolMin: 2,      // minimum connections kept alive
       poolMax: 10,     // maximum concurrent connections
       poolIncrement: 1 // connections added when pool is exhausted

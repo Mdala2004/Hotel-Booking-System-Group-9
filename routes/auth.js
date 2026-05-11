@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const oracledb = require('oracledb');
 const { getConnection } = require('../db');
+const bcrypt = require('bcrypt');
 
 const router = express.Router();
 
@@ -27,7 +28,9 @@ router.post('/login', async (req, res, next) => {
 
     const guest = result.rows[0];
 
-    if (password !== guest.PASSWORD)
+    const match = await bcrypt.compare(password, guest.PASSWORD);
+
+if (!match)
       return res.status(401).json({ error: 'Invalid username or password' });
 
     const token = jwt.sign(

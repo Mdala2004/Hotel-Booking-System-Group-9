@@ -49,7 +49,7 @@ router.get('/:id', authMiddleware, async (req, res, next) => {
   try {
     conn = await getConnection();
     const result = await conn.execute(
-      `SELECT * FROM vw_reservation_details WHERE reservation_id = :id`,
+      `SELECT * FROM reservations WHERE reservation_id = :id`,
       { id: req.params.id },
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );

@@ -9,11 +9,11 @@ app.use(express.json());
 
 //Routes 
 app.use('/auth', require('./routes/auth'));
-app.use('/guest', require('./routes/guest'));
-app.use('/room', require('./routes/room'));
+app.use('/guests', require('./routes/guest'));
+app.use('/rooms', require('./routes/room'));
 app.use('/roomType', require('./routes/roomType'));
 app.use('/reservation', require('./routes/reservation'));
-app.use('/payment', require('./routes/payment'));
+app.use('/payments', require('./routes/payment'));
 app.use('/staff', require('./routes/staff'));
 
 // Health check
