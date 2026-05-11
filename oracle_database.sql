@@ -145,3 +145,20 @@ SELECT * FROM room;
 SELECT * FROM staff;
 SELECT * FROM reservations;
 SELECT * FROM payments;
+
+ALTER TABLE guest MODIFY password VARCHAR2(255);
+
+CREATE OR REPLACE VIEW vw_reservation_details AS
+SELECT
+    r.reservation_id,
+    g.first_name,
+    g.last_name,
+    r.room_id,
+    r.staff_id,
+    r.check_in_date,
+    r.check_out_date,
+    r.number_of_guests,
+    r.total_cost,
+    r.payment_status
+FROM reservations r
+JOIN guest g ON r.guest_id = g.guest_id;
