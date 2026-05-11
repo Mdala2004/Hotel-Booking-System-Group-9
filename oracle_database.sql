@@ -162,3 +162,15 @@ SELECT
     r.payment_status
 FROM reservations r
 JOIN guest g ON r.guest_id = g.guest_id;
+
+-- =========================
+-- INDEXES (FOR PERFORMANCE)
+-- =========================
+
+CREATE INDEX idx_guest_username ON guest(username);
+CREATE INDEX idx_guest_email ON guest(email);
+
+CREATE INDEX idx_reservation_guest ON reservations(guest_id);
+CREATE INDEX idx_reservation_room ON reservations(room_id);
+
+CREATE INDEX idx_payment_reservation ON payments(reservation_id);
