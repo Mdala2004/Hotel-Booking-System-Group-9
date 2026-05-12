@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal | Hotel Transylvania</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0d0a14;
+            --bg-dark: #1a0f2e;
+            --bg-card: #1e1335;
+            --bg-card-hover: #281a45;
+            --purple-mid: #3d2a5c;
+            --purple-light: #5c3d85;
+            --gold: #c8a84e;
+            --gold-light: #e0c878;
+            --gold-dark: #8b6914;
+            --red-accent: #8b1a2b;
+            --red-bright: #b81c36;
+            --cream: #f0e6d3;
+            --cream-dark: #d5c8b0;
+            --text-light: #e8e0d5;
+            --text-muted: #b0a595;
+            --border-gold: rgba(200, 168, 78, 0.4);
+            --shadow-gold: rgba(200, 168, 78, 0.25);
+            --shadow-dark: rgba(0, 0, 0, 0.6);
+            --font-gothic: 'Cinzel', 'Cinzel Decorative', serif;
+            --font-body: 'Inter', 'Playfair Display', serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg-deep);
+            color: var(--text-light);
+            font-family: var(--font-body);
+            display: flex;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(100,40,120,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 60%, rgba(180,30,50,0.08) 0%, transparent 55%);
+        }
+
+        .sidebar {
+            width: 260px;
+            background: rgba(13,10,20,0.95);
+            border-right: 1px solid var(--border-gold);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+        .sidebar-logo {
+            font-family: var(--font-gothic);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .sidebar-menu li a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--cream-dark);
+            text-decoration: none;
+            font-family: var(--font-gothic);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            transition: all 0.25s ease;
+        }
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: var(--bg-card-hover);
+            color: var(--gold-light);
+            border-left: 3px solid var(--gold);
+        }
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--border-gold);
+            padding-top: 15px;
+        }
+        .btn-logout {
+            width: 100%;
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 10px;
+            font-family: var(--font-gothic);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { background: var(--gold); color: #000; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 40px;
+        }
+        .section-title {
+            font-family: var(--font-gothic);
+            font-size: 1.8rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .btn-primary {
+            font-family: var(--font-gothic);
+            background: var(--red-accent);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary:hover { background: var(--red-bright); box-shadow: 0 0 15px rgba(184,28,54,0.5); }
+        .btn-secondary {
+            font-family: var(--font-gothic);
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-gold); font-size: 0.9rem; }
+        th { color: var(--gold); font-family: var(--font-gothic); }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; text-transform: uppercase; }
+        .status-badge.available { background: #2d6a3f; color: #e0ffe0; }
+        .status-badge.occupied { background: #8b6914; color: #fff; }
+        .status-badge.maintenance { background: #5a1a1a; color: #ffb3b3; }
+        .toast { position:fixed; bottom:30px; right:30px; z-index:9999; padding:14px 22px; border-radius:6px; font-family:var(--font-gothic); font-size:0.85rem; animation: toastIn 0.4s; }
+        .toast.success { background:#2d6a3f; } .toast.error { background:#8b1a2b; } .toast.info { background:#3d2a5c; }
+        @keyframes toastIn { from{opacity:0;transform:translateX(50px);} to{opacity:1;transform:translateX(0);} }
+        .hidden { display: none; }
+        .loading { text-align:center; padding:30px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo" onclick="window.location.href='index.html'">🏰 STAFF</div>
+        <ul class="sidebar-menu" id="sidebarMenu">
+            <!-- dynamically filled based on role -->
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <!-- Sections will be shown/hidden here -->
+        <div id="section-reception" class="hidden">
+            <h2 class="section-title">📋 Reception Desk</h2>
+            <div class="card">
+                <h3 style="color:var(--gold);">Today's Reservations</h3>
+                <div id="receptionReservations">Loading...</div>
+            </div>
+        </div>
+        <div id="section-housekeeping" class="hidden">
+            <h2 class="section-title">🧹 Housekeeping</h2>
+            <div class="card">
+                <h3 style="color:var(--gold);">Room Status</h3>
+                <div id="roomStatusList">Loading...</div>
+            </div>
+        </div>
+        <div id="section-finance" class="hidden">
+            <h2 class="section-title">💰 Finance</h2>
+            <div class="card">
+                <h3 style="color:var(--gold);">Payment & Refunds</h3>
+                <div id="financeContent">Loading...</div>
+            </div>
+        </div>
+        <div id="section-manager" class="hidden">
+            <h2 class="section-title">📊 Management Dashboard</h2>
+            <div id="managerContent">Loading...</div>
+        </div>
+        <div id="section-admin" class="hidden">
+            <h2 class="section-title">⚙️ System Administration</h2>
+            <div id="adminContent">Loading...</div>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <script>
+        // ---------- Auth & Role ----------
+        const token = localStorage.getItem('authToken');
+        const role = localStorage.getItem('userRole');
+        let staffData = null;
+        try { staffData = JSON.parse(localStorage.getItem('userData')); } catch(e){}
+
+        if (!token || role !== 'staff') {
+            window.location.href = 'index.html';
+        }
+
+        // Staff role from stored data: Manager, Receptionist, Housekeeping, Admin, Finance
+        const staffRole = staffData?.role || staffData?.staff_role || 'Receptionist';
+
+        function showToast(msg, type='info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = msg;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // ---------- Build Sidebar based on role ----------
+        const menuItems = {
+            Receptionist: [
+                { label: 'Reception', section: 'reception' }
+            ],
+            Housekeeping: [
+                { label: 'Room Status', section: 'housekeeping' }
+            ],
+            Finance: [
+                { label: 'Payments & Refunds', section: 'finance' }
+            ],
+            Manager: [
+                { label: 'Dashboard', section: 'manager' }
+            ],
+            Admin: [
+                { label: 'Admin Panel', section: 'admin' }
+            ]
+        };
+
+        // Combine all sections that this staff role can see (if multiple roles allowed)
+        function getMenuForRole(role) {
+            // In production, staff may have a single role; design for the listed ones
+            const allowed = {
+                'Manager': ['reception','housekeeping','finance','manager','admin'],
+                'Receptionist': ['reception'],
+                'Housekeeping': ['housekeeping'],
+                'Finance': ['finance'],
+                'Admin': ['admin']
+            };
+            // Determine which sections to show
+            const sections = allowed[role] || ['reception'];
+            const menu = [];
+            if (sections.includes('reception')) menu.push({ label: 'Reception', section: 'reception' });
+            if (sections.includes('housekeeping')) menu.push({ label: 'Housekeeping', section: 'housekeeping' });
+            if (sections.includes('finance')) menu.push({ label: 'Finance', section: 'finance' });
+            if (sections.includes('manager')) menu.push({ label: 'Management', section: 'manager' });
+            if (sections.includes('admin')) menu.push({ label: 'Admin', section: 'admin' });
+            return menu;
+        }
+
+        function renderSidebar() {
+            const menu = getMenuForRole(staffRole);
+            const sidebar = document.getElementById('sidebarMenu');
+            sidebar.innerHTML = menu.map(item => `
+                <li><a href="#" onclick="showSection('${item.section}')" data-section="${item.section}">${item.label}</a></li>
+            `).join('');
+            // Show first section by default
+            if (menu.length > 0) {
+                showSection(menu[0].section);
+            }
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.main-content > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById('section-' + sectionId)?.classList.remove('hidden');
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`.sidebar-menu a[data-section="${sectionId}"]`)?.classList.add('active');
+
+            // Load data for that section
+            switch(sectionId) {
+                case 'reception': loadReceptionData(); break;
+                case 'housekeeping': loadRoomStatus(); break;
+                case 'finance': loadFinanceData(); break;
+                case 'manager': loadManagerData(); break;
+                case 'admin': loadAdminData(); break;
+            }
+        }
+
+        // ---------- API Helpers ----------
+        async function fetchWithAuth(url, options = {}) {
+            const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers };
+            try {
+                const response = await fetch(url, { ...options, headers });
+                if (!response.ok) throw new Error('API error');
+                return await response.json();
+            } catch (e) {
+                console.warn('Backend unreachable, using demo data');
+                return null;
+            }
+        }
+
+        // ---------- Reception ----------
+        async function loadReceptionData() {
+            const div = document.getElementById('receptionReservations');
+            div.innerHTML = '<div class="loading">Loading reservations...</div>';
+            const data = await fetchWithAuth('/api/staff/reservations?status=confirmed');
+            if (data) {
+                renderReservationList(data.reservations, div);
+            } else {
+                // Demo data
+                div.innerHTML = `
+                <table><tr><th>Guest</th><th>Room</th><th>Dates</th><th>Status</th><th>Action</th></tr>
+                <tr><td>John Doe</td><td>101 (Single)</td><td>15/06/2026 - 18/06/2026</td><td><span class="status-badge occupied">Confirmed</span></td><td><button class="btn-secondary" onclick="checkInOut('DEMO1','checkin')">Check-in</button></td></tr></table>`;
+            }
+        }
+
+        function renderReservationList(reservations, container) {
+            if (!reservations.length) {
+                container.innerHTML = '<p>No reservations found.</p>';
+                return;
+            }
+            let html = `<table><tr><th>Guest</th><th>Room</th><th>Dates</th><th>Status</th><th>Action</th></tr>`;
+            reservations.forEach(r => {
+                html += `<tr>
+                    <td>${r.guest_name}</td>
+                    <td>${r.room_number} (${r.room_type})</td>
+                    <td>${formatDateZA(r.check_in)} - ${formatDateZA(r.check_out)}</td>
+                    <td><span class="status-badge ${r.status}">${r.status}</span></td>
+                    <td>
+                        ${r.status === 'Confirmed' ? `<button class="btn-secondary" onclick="checkInOut('${r.id}','checkin')">Check-in</button>` : ''}
+                        ${r.status === 'Occupied' ? `<button class="btn-secondary" onclick="checkInOut('${r.id}','checkout')">Check-out</button>` : ''}
+                    </td>
+                </tr>`;
+            });
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        async function checkInOut(reservationId, action) {
+            const endpoint = action === 'checkin' ? `/api/staff/reservations/${reservationId}/checkin` : `/api/staff/reservations/${reservationId}/checkout`;
+            const result = await fetchWithAuth(endpoint, { method: 'PUT' });
+            if (result) {
+                showToast(`Successfully ${action === 'checkin' ? 'checked in' : 'checked out'}.`, 'success');
+                loadReceptionData();
+            } else {
+                showToast(`Demo: ${action} processed.`, 'info');
+                // Update demo UI manually (if needed)
+            }
+        }
+
+        function formatDateZA(iso) {
+            if (!iso) return '';
+            const [y,m,d] = iso.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        // ---------- Housekeeping ----------
+        async function loadRoomStatus() {
+            const div = document.getElementById('roomStatusList');
+            div.innerHTML = '<div class="loading">Loading rooms...</div>';
+            const data = await fetchWithAuth('/api/staff/rooms');
+            if (data) {
+                renderRoomStatus(data.rooms, div);
+            } else {
+                const demoRooms = [
+                    { room_id:1, room_number:'001', room_type:'Single', status:'Available' },
+                    { room_id:2, room_number:'002', room_type:'Double', status:'Occupied' },
+                    { room_id:3, room_number:'003', room_type:'Twin', status:'Maintenance' }
+                ];
+                renderRoomStatus(demoRooms, div);
+            }
+        }
+
+        function renderRoomStatus(rooms, container) {
+            let html = `<table><tr><th>Room</th><th>Type</th><th>Status</th><th>Action</th></tr>`;
+            rooms.forEach(room => {
+                html += `<tr>
+                    <td>${room.room_number}</td>
+                    <td>${room.room_type}</td>
+                    <td><span class="status-badge ${room.status.toLowerCase()}">${room.status}</span></td>
+                    <td>
+                        <select id="status-${room.room_id}" onchange="updateRoomStatus(${room.room_id}, this.value)">
+                            <option value="Available" ${room.status==='Available'?'selected':''}>Available</option>
+                            <option value="Occupied" ${room.status==='Occupied'?'selected':''}>Occupied</option>
+                            <option value="Under Maintenance" ${room.status==='Under Maintenance'?'selected':''}>Maintenance</option>
+                        </select>
+                    </td>
+                </tr>`;
+            });
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        async function updateRoomStatus(roomId, newStatus) {
+            const result = await fetchWithAuth(`/api/staff/rooms/${roomId}/status`, {
+                method: 'PUT',
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (result) {
+                showToast('Room status updated.', 'success');
+            } else {
+                showToast('Demo: status updated.', 'info');
+            }
+        }
+
+        // ---------- Finance ----------
+        async function loadFinanceData() {
+            const div = document.getElementById('financeContent');
+            div.innerHTML = '<div class="loading">Loading payments...</div>';
+            const data = await fetchWithAuth('/api/staff/payments');
+            if (data) {
+                renderPayments(data.payments, div);
+            } else {
+                div.innerHTML = `<p>Demo: No pending payments.</p>`;
+            }
+        }
+
+        function renderPayments(payments, container) {
+            // similar table with refund button
+            container.innerHTML = '<p>Payment management UI (integrate real data).</p>';
+        }
+
+        // ---------- Manager ----------
+        async function loadManagerData() {
+            const div = document.getElementById('managerContent');
+            div.innerHTML = '<div class="loading">Loading reports...</div>';
+            const occupancy = await fetchWithAuth('/api/staff/reports/occupancy');
+            const revenue = await fetchWithAuth('/api/staff/reports/revenue');
+            const guestHistory = await fetchWithAuth('/api/staff/reports/guest-history');
+            div.innerHTML = `
+                <div class="card"><h3>Occupancy Today: ${occupancy?.rate || 'Demo: 60%'}</h3></div>
+                <div class="card"><h3>Revenue This Month: R${revenue?.total || '45,000'}</h3></div>
+                <div class="card"><h3>Recent Guest History</h3><p>${guestHistory?.list || 'John Doe, Jane Smith...'}</p></div>
+            `;
+        }
+
+        // ---------- Admin ----------
+        async function loadAdminData() {
+            const div = document.getElementById('adminContent');
+            div.innerHTML = `
+                <div class="card">
+                    <h3>Manage Staff Accounts</h3>
+                    <p>View / add / edit staff members.</p>
+                    <button class="btn-primary" onclick="alert('Integrate staff management API.')">Add Staff</button>
+                </div>`;
+        }
+
+        // ---------- On load ----------
+        renderSidebar();
+    </script>
+</body>
+</html>
