@@ -230,7 +230,6 @@
 <script>
     // ---------- Global State ----------
     let authToken = localStorage.getItem('authToken') || null;
-    let userRole = localStorage.getItem('userRole') || null;
     let userData = null;
     try { userData = JSON.parse(localStorage.getItem('userData')); } catch(e) {}
 
@@ -269,7 +268,7 @@
     function updateAuthUI() {
         const btn = document.getElementById('userStatusBtn');
         if (authToken && userData) {
-            const name = userData.first_name || userData.name || 'Guest';
+            const name = userData.name || userData.first_name || 'Guest';
             btn.textContent = `👤 ${name.split(' ')[0]} (Logout)`;
             btn.onclick = logout;
         } else {
@@ -293,9 +292,8 @@
 
     function logout() {
         localStorage.removeItem('authToken');
-        localStorage.removeItem('userRole');
         localStorage.removeItem('userData');
-        authToken = null; userRole = null; userData = null;
+        authToken = null; userData = null;
         updateAuthUI();
         showToast('Logged out.', 'info');
     }
@@ -337,7 +335,7 @@
         showLoading('availabilityResult');
 
         try {
-            const response = await fetch('/api/rooms/available', {
+            const response = await fetch('/rooms/check-availability', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -361,14 +359,14 @@
         }
     }
 
-    // UPDATED: now accepts numGuests and filters rooms by max_occupancy
     function generateDemoRooms(checkIn, checkOut, guests) {
         const roomTypes = [
             { type: 'Single', price: 650, maxOccupancy: 1 },
             { type: 'Double', price: 900, maxOccupancy: 2 },
             { type: 'Twin', price: 950, maxOccupancy: 2 },
             { type: 'Family', price: 1800, maxOccupancy: 4 },
-            { type: 'Ensuite', price: 1200, maxOccupancy: 2 }
+            { type: 'Ensuite', price: 1200, maxOccupancy: 2 },
+            { type: 'Presidential Suite', price: 5000, maxOccupancy: 6 }
         ];
         const rooms = [];
         for (let i = 1; i <= 10; i++) {
@@ -385,7 +383,7 @@
                 price_per_night: typeInfo.price,
                 max_occupancy: typeInfo.maxOccupancy,
                 status: isBooked ? 'Occupied' : 'Available',
-                features: 'Wi-Fi, TV, ' + (typeInfo.type === 'Ensuite' ? 'Private Bath' : 'Shared Bath')
+                features: 'Wi-Fi, TV, ' + (typeInfo.type === 'Presidential Suite' ? '3 Bedrooms, Luxury Suite' : (typeInfo.type === 'Ensuite' ? 'Private Bath' : 'Shared Bath'))
             });
         }
         return rooms;
@@ -434,7 +432,6 @@
             <strong>Check-in:</strong> ${formatDateZA(checkInDate)} | <strong>Check-out:</strong> ${formatDateZA(checkOutDate)}<br>
             <strong>Total Price:</strong> R${total} (${nights} nights)
         `;
-        // Autofill with accurate stored data (now includes first_name, last_name, phone)
         if (userData) {
             document.getElementById('firstName').value = userData.first_name || '';
             document.getElementById('lastName').value = userData.last_name || '';
@@ -475,6 +472,7 @@
         document.getElementById('paymentSection').style.display = 'none';
     }
 
+    // ---------- Confirm Booking (integrated) ----------
     async function confirmBooking() {
         if (!authToken) { showToast('Session expired. Please sign in again.', 'error'); return; }
         const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
@@ -486,61 +484,98 @@
         }
         if (!selectedRoom) { showToast('No room selected.', 'error'); return; }
 
-        const roomToBook = { room_id: selectedRoom.room_id, room_type: selectedRoom.room_type, room_number: selectedRoom.room_number, price_per_night: selectedRoom.price_per_night };
+        const guestId = userData?.id;
+        if (!guestId) {
+            showToast('Guest ID missing. Please log in again.', 'error');
+            return;
+        }
 
-        const bookingData = {
-            room_id: roomToBook.room_id,
-            check_in: checkInDate, check_out: checkOutDate, guests: numGuests,
-            guest: {
-                first_name: document.getElementById('firstName').value.trim(),
-                last_name: document.getElementById('lastName').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('phone').value.trim()
-            },
-            payment: { method: 'Credit Card', card_last_four: cardNumber.slice(-4),
-                amount: roomToBook.price_per_night * Math.ceil((new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24))
-            }
+        const nights = Math.ceil((new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24));
+        const totalCost = selectedRoom.price_per_night * nights;
+        const reservationId = 'RES-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+        const paymentId = 'PAY-' + Date.now();
+
+        const reservationData = {
+            reservation_id: reservationId,
+            guest_id: guestId,
+            room_id: selectedRoom.room_id,
+            staff_id: null,
+            check_in_date: checkInDate,
+            check_out_date: checkOutDate,
+            number_of_guests: numGuests,
+            total_cost: totalCost,
+            payment_status: 'Pending'
         };
 
         const btn = document.querySelector('#paymentSection .btn-primary');
         btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Processing...';
 
         try {
-            const response = await fetch('/api/bookings', {
+            const resResp = await fetch('/reservation', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-                body: JSON.stringify(bookingData)
+                body: JSON.stringify(reservationData)
             });
-            if (response.ok) {
-                const data = await response.json();
-                showToast('Booking confirmed! Enjoy your stay.', 'success');
-            } else {
-                const err = await response.json();
-                showToast(err.message || 'Booking failed.', 'error');
+            if (!resResp.ok) {
+                const err = await resResp.json();
+                showToast(err.error || 'Reservation failed.', 'error');
+                btn.disabled = false; btn.innerHTML = 'Confirm Booking & Pay';
+                return;
             }
-        } catch (err) {
-            console.warn('Backend unreachable, demo booking.');
-            showToast('🎉 Booking confirmed! (Demo mode)', 'success');
-            saveDemoBooking(bookingData, roomToBook);
-        } finally {
+
+            const paymentResp = await fetch('/payments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                body: JSON.stringify({
+                    payment_id: paymentId,
+                    reservation_id: reservationId,
+                    amount: totalCost,
+                    payment_method: 'Card',
+                    payment_date: new Date().toISOString().split('T')[0],
+                    payment_status: 'Paid'
+                })
+            });
+            if (!paymentResp.ok) {
+                const err = await paymentResp.json();
+                showToast(err.error || 'Payment failed.', 'error');
+                btn.disabled = false; btn.innerHTML = 'Confirm Booking & Pay';
+                return;
+            }
+
+            await fetch(`/reservation/${reservationId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                body: JSON.stringify({ payment_status: 'Confirmed' })
+            });
+
+            showToast('Booking confirmed! Enjoy your stay.', 'success');
             document.getElementById('availabilityResult').innerHTML = '';
             document.getElementById('bookingFormCard').style.display = 'none';
             document.getElementById('paymentSection').style.display = 'none';
             selectedRoom = null;
+        } catch (err) {
+            console.warn('Backend unreachable, demo booking.');
+            showToast('🎉 Booking confirmed! (Demo mode)', 'success');
+            saveDemoBooking(reservationData, totalCost);
+            document.getElementById('availabilityResult').innerHTML = '';
+            document.getElementById('bookingFormCard').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'none';
+            selectedRoom = null;
+        } finally {
             btn.disabled = false; btn.innerHTML = 'Confirm Booking & Pay';
         }
     }
 
-    function saveDemoBooking(bookingData, roomInfo) {
+    function saveDemoBooking(reservationData, totalCost) {
         let demoBookings = JSON.parse(localStorage.getItem('demoBookings') || '[]');
         demoBookings.push({
-            id: 'DEMO-' + Date.now(),
-            room_type: roomInfo.room_type,
-            room_number: roomInfo.room_number,
-            check_in: bookingData.check_in,
-            check_out: bookingData.check_out,
-            guests: bookingData.guests,
-            total_cost: bookingData.payment.amount,
+            id: reservationData.reservation_id,
+            room_type: selectedRoom.room_type,
+            room_number: selectedRoom.room_number,
+            check_in: reservationData.check_in_date,
+            check_out: reservationData.check_out_date,
+            guests: reservationData.number_of_guests,
+            total_cost: totalCost,
             status: 'Confirmed',
             created_at: new Date().toISOString()
         });
@@ -551,7 +586,10 @@
         updateAuthUI();
         const params = new URLSearchParams(window.location.search);
         const roomType = params.get('type');
-        if (roomType) console.log('Pre-selected room type:', roomType);
+        if (roomType) {
+            console.log('Pre-selected room type:', roomType);
+            // Optional: you could auto-fill the guest count or highlight that room type later
+        }
     });
 </script>
 </body>
