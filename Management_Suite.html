@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Hotel Transylvania | Management Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #e9f0fc 0%, #d9e4f5 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* decorative circles matching login page */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0) 70%);
+            top: 10%;
+            left: -100px;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, rgba(56,189,248,0) 70%);
+            bottom: 0;
+            right: -120px;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header with login-page style brand */
+        .header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #3886b6, #31e2e2);
+            width: 70px;
+            height: 70px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 28px;
+            box-shadow: 0 12px 18px -8px rgba(79, 70, 229, 0.4);
+            margin-bottom: 1rem;
+        }
+
+        .brand-icon i {
+            font-size: 2.3rem;
+            color: rgb(72, 68, 68);
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #1e293b, #2d3a5e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: #5b6e8c;
+            font-size: 0.9rem;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.85rem 1.5rem;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #4a627a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+        }
+
+        .tab-btn i {
+            font-size: 1rem;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(105deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(79,70,229,0.25);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #eef2fa;
+            color: #1e4a6e;
+        }
+
+        /* Tab Panels */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .tab-panel.active-panel {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Cards & Grids */
+        .card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 18px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1f3b4c;
+        }
+
+        .badge {
+            background: #eef2ff;
+            padding: 0.3rem 0.9rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        /* Room Grid (Availability) */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .room-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            transition: all 0.2s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px -10px rgba(0,0,0,0.1);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .room-number {
+            font-weight: 800;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #3886b6, #31e2e2);
+            color: rgb(72, 68, 68);
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+        }
+
+        .room-type {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.7rem;
+            border-radius: 2rem;
+            font-weight: 700;
+        }
+
+        .status-available { background: #d1fae5; color: #065f46; }
+        .status-occupied { background: #fee2e2; color: #b91c1c; }
+        .status-maintenance { background: #fef3c7; color: #92400e; }
+
+        .room-details p {
+            font-size: 0.8rem;
+            margin: 0.4rem 0;
+            color: #4a627a;
+        }
+
+        /* Tables for bookings & payments */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.9rem 0.8rem;
+            border-bottom: 1px solid #e9edf2;
+        }
+
+        th {
+            font-weight: 600;
+            color: #4f46e5;
+            background: #f8fafc;
+        }
+
+        .booking-status, .payment-status {
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .status-confirmed { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #b45309; }
+        .status-cancelled { background: #fee2e2; color: #b91c1c; }
+
+        .payment-paid { background: #d1fae5; color: #065f46; }
+        .payment-refunded { background: #f1f5f9; color: #475569; }
+
+        /* Form elements for search/filter */
+        .filter-bar {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-bar input, .filter-bar select {
+            padding: 0.6rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 2rem;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            transition: all 0.25s ease;
+        }
+
+        .filter-bar input:focus, .filter-bar select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+
+        .btn-sm {
+            background: linear-gradient(105deg, #4f46e5 0%, #6366f1 100%);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-sm:hover {
+            background: linear-gradient(105deg, #4338ca 0%, #4f46e5 100%);
+            transform: scale(0.98);
+        }
+
+        /* Summary stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .stat-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c86a3;
+        }
+
+        .stat-value {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #1f3b4c;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .tab-btn span { display: none; }
+            .tab-btn i { margin: 0; }
+            .tab-btn { padding: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <div class="header">
+        <div class="brand-icon">
+            <i class="fas fa-house-chimney"></i>
+        </div>
+        <h1>Hotel Transylvania</h1>
+        <div class="subtitle">Management Suite · Room availability, Booking oversight & Payment tracking</div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="availability"><i class="fas fa-bed"></i> <span>Room Availability</span></button>
+        <button class="tab-btn" data-tab="bookings"><i class="fas fa-calendar-check"></i> <span>Booking Management</span></button>
+        <button class="tab-btn" data-tab="payments"><i class="fas fa-credit-card"></i> <span>Payment Tracking</span></button>
+    </div>
+
+    <!-- ================= PANEL 1: ROOM AVAILABILITY ================= -->
+    <div id="availabilityPanel" class="tab-panel active-panel">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-door-open"></i> Real-time Room Status</h2>
+                <div class="badge"><i class="fas fa-sync-alt"></i> Live availability (max 10 rooms)</div>
+            </div>
+            <div class="filter-bar">
+                <input type="text" id="roomSearch" placeholder="Filter by room number or type..." style="flex:1">
+                <select id="roomStatusFilter">
+                    <option value="all">All statuses</option>
+                    <option value="Available">Available</option>
+                    <option value="Occupied">Occupied</option>
+                    <option value="Under Maintenance">Maintenance</option>
+                </select>
+            </div>
+            <div id="roomsContainer" class="rooms-grid">
+                <!-- dynamic rooms injected -->
+            </div>
+        </div>
+        <div class="stats-grid" id="roomStats">
+            <!-- summary stats injected -->
+        </div>
+    </div>
+
+    <!-- ================= PANEL 2: BOOKING MANAGEMENT ================= -->
+    <div id="bookingsPanel" class="tab-panel">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-list-ul"></i> All Reservations</h2>
+                <div class="badge"><i class="fas fa-rule"></i> One room per booking</div>
+            </div>
+            <div class="filter-bar">
+                <input type="text" id="bookingSearch" placeholder="Search by guest name or room #" style="flex:1">
+                <select id="bookingStatusFilter">
+                    <option value="all">All statuses</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <table id="bookingsTable">
+                    <thead>
+                        <tr><th>Booking ID</th><th>Guest</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Guests</th><th>Status</th><th>Total (ZAR)</th></tr>
+                    </thead>
+                    <tbody id="bookingsTableBody">
+                        <!-- dynamic bookings -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="stats-grid" id="bookingStats"></div>
+    </div>
+
+    <!-- ================= PANEL 3: PAYMENT TRACKING ================= -->
+    <div id="paymentsPanel" class="tab-panel">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-receipt"></i> Invoices & Payment Status</h2>
+                <div class="badge">Payment must be completed before confirmation</div>
+            </div>
+            <div class="filter-bar">
+                <input type="text" id="paymentSearch" placeholder="Search by Invoice #, guest or booking ID" style="flex:1">
+            </div>
+            <div class="table-wrapper">
+                <table id="paymentsTable">
+                    <thead>
+                        <tr><th>Invoice No.</th><th>Booking ID</th><th>Guest</th><th>Amount (ZAR)</th><th>Method</th><th>Payment Date</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        <!-- dynamic payments -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="stats-grid" id="paymentStats"></div>
+    </div>
+</div>
+
+<script>
+    // ======================= DATA MODELS (strictly based on Phase 1 & 2) =======================
+    // Rooms (max 10 rooms: numbers 001-010)
+    const roomsData = [
+        { roomId: 1, roomNumber: "001", type: "Single", pricePerNight: 950, maxOccupancy: 1, status: "Available", amenities: "Wi-Fi, AC", rating: 4.2 },
+        { roomId: 2, roomNumber: "002", type: "Double", pricePerNight: 1450, maxOccupancy: 2, status: "Occupied", amenities: "Wi-Fi, Breakfast", rating: 4.5 },
+        { roomId: 3, roomNumber: "003", type: "Twin", pricePerNight: 1350, maxOccupancy: 2, status: "Available", amenities: "City view", rating: 4.3 },
+        { roomId: 4, roomNumber: "004", type: "Family", pricePerNight: 2200, maxOccupancy: 4, status: "Available", amenities: "Extra space", rating: 4.7 },
+        { roomId: 5, roomNumber: "005", type: "Double", pricePerNight: 1480, maxOccupancy: 2, status: "Under Maintenance", amenities: "Balcony", rating: 4.0 },
+        { roomId: 6, roomNumber: "006", type: "Single", pricePerNight: 920, maxOccupancy: 1, status: "Available", amenities: "Garden view", rating: 4.1 },
+        { roomId: 7, roomNumber: "007", type: "Family", pricePerNight: 2350, maxOccupancy: 4, status: "Occupied", amenities: "Kitchenette", rating: 4.8 },
+        { roomId: 8, roomNumber: "008", type: "Twin", pricePerNight: 1300, maxOccupancy: 2, status: "Available", amenities: "Soundproof", rating: 4.4 },
+        { roomId: 9, roomNumber: "009", type: "Double", pricePerNight: 1500, maxOccupancy: 2, status: "Available", amenities: "Sea view", rating: 4.6 },
+        { roomId: 10, roomNumber: "010", type: "Single", pricePerNight: 880, maxOccupancy: 1, status: "Occupied", amenities: "Compact", rating: 3.9 }
+    ];
+
+    // Bookings (linked to guests & rooms)
+    let bookingsData = [
+        { bookingId: "B1001", guestName: "Sibusiso Mazibuko", roomNumber: "002", checkIn: "2026-05-15", checkOut: "2026-05-18", numGuests: 2, status: "Confirmed", totalCost: 4350 },
+        { bookingId: "B1002", guestName: "Sarah Smith", roomNumber: "007", checkIn: "2026-05-10", checkOut: "2026-05-14", numGuests: 3, status: "Confirmed", totalCost: 9400 },
+        { bookingId: "B1003", guestName: "Bongani Zulu", roomNumber: "010", checkIn: "2026-05-20", checkOut: "2026-05-22", numGuests: 1, status: "Pending", totalCost: 1760 },
+        { bookingId: "B1004", guestName: "Boitumelo Mkhwanazi", roomNumber: "005", checkIn: "2026-05-01", checkOut: "2026-05-05", numGuests: 2, status: "Cancelled", totalCost: 5920 },
+        { bookingId: "B1005", guestName: "Francis Lugayizi", roomNumber: "008", checkIn: "2026-05-25", checkOut: "2026-05-28", numGuests: 2, status: "Confirmed", totalCost: 3900 },
+        { bookingId: "B1006", guestName: "Bongani Nkosi", roomNumber: "004", checkIn: "2026-06-01", checkOut: "2026-06-05", numGuests: 4, status: "Pending", totalCost: 8800 }
+    ];
+
+    // Payments linked to reservations (Invoice No., matches total cost, payment status)
+    let paymentsData = [
+        { invoiceNo: "INV-1001", bookingId: "B1001", guestName: "Sibusiso Mazibuko", amount: 4350, method: "Credit Card", paymentDate: "2026-05-14", status: "Paid" },
+        { invoiceNo: "INV-1002", bookingId: "B1002", guestName: "Sarah Smith", amount: 9400, method: "EFT", paymentDate: "2026-05-09", status: "Paid" },
+        { invoiceNo: "INV-1003", bookingId: "B1003", guestName: "Bongani Zulu", amount: 1760, method: "Debit Card", paymentDate: "2026-05-19", status: "Pending" },
+        { invoiceNo: "INV-1004", bookingId: "B1004", guestName: "Boitumelo Mkhwanazi", amount: 5920, method: "Credit Card", paymentDate: "2026-04-30", status: "Refunded" },
+        { invoiceNo: "INV-1005", bookingId: "B1005", guestName: "Francis Lugayizi", amount: 3900, method: "Cash", paymentDate: "2026-05-24", status: "Paid" },
+        { invoiceNo: "INV-1006", bookingId: "B1006", guestName: "Bongani Nkosi", amount: 8800, method: "EFT", paymentDate: "", status: "Pending" }
+    ];
+
+    // Helper to update room stats counts
+    function updateRoomDisplay() {
+        const searchTerm = document.getElementById('roomSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('roomStatusFilter').value;
+        let filtered = roomsData.filter(room => {
+            const matchSearch = room.roomNumber.includes(searchTerm) || room.type.toLowerCase().includes(searchTerm);
+            const matchStatus = statusFilter === 'all' || room.status === statusFilter;
+            return matchSearch && matchStatus;
+        });
+
+        const container = document.getElementById('roomsContainer');
+        container.innerHTML = filtered.map(room => `
+            <div class="room-card">
+                <div class="room-header">
+                    <span class="room-number">${room.roomNumber}</span>
+                    <span class="room-type">${room.type}</span>
+                    <span class="status-badge status-${room.status === 'Available' ? 'available' : (room.status === 'Occupied' ? 'occupied' : 'maintenance')}">${room.status}</span>
+                </div>
+                <div class="room-details">
+                    <p><i class="fas fa-user-friends"></i> Max ${room.maxOccupancy} guests</p>
+                    <p><i class="fas fa-rand"></i> ZAR ${room.pricePerNight} / night</p>
+                    <p><i class="fas fa-wifi"></i> ${room.amenities}</p>
+                    <p><i class="fas fa-star"></i> Rating: ${room.rating}/5</p>
+                </div>
+            </div>
+        `).join('');
+
+        // stats
+        const totalRooms = roomsData.length;
+        const available = roomsData.filter(r => r.status === 'Available').length;
+        const occupied = roomsData.filter(r => r.status === 'Occupied').length;
+        const maintenance = roomsData.filter(r => r.status === 'Under Maintenance').length;
+        document.getElementById('roomStats').innerHTML = `
+            <div class="stat-card"><div class="stat-title">Total Rooms</div><div class="stat-value">${totalRooms}/10</div></div>
+            <div class="stat-card"><div class="stat-title">Available</div><div class="stat-value">${available}</div></div>
+            <div class="stat-card"><div class="stat-title">Occupied</div><div class="stat-value">${occupied}</div></div>
+            <div class="stat-card"><div class="stat-title">Maintenance</div><div class="stat-value">${maintenance}</div></div>
+        `;
+    }
+
+    // Bookings table render
+    function renderBookings() {
+        const search = document.getElementById('bookingSearch').value.toLowerCase();
+        const statusFltr = document.getElementById('bookingStatusFilter').value;
+        let filtered = bookingsData.filter(b => {
+            const matchSearch = b.guestName.toLowerCase().includes(search) || b.roomNumber.includes(search);
+            const matchStatus = statusFltr === 'all' || b.status === statusFltr;
+            return matchSearch && matchStatus;
+        });
+        const tbody = document.getElementById('bookingsTableBody');
+        tbody.innerHTML = filtered.map(b => `
+            <tr>
+                <td><strong>${b.bookingId}</strong></td>
+                <td>${b.guestName}</td>
+                <td>Room ${b.roomNumber}</td>
+                <td>${b.checkIn}</td>
+                <td>${b.checkOut}</td>
+                <td>${b.numGuests}</td>
+                <td><span class="booking-status status-${b.status.toLowerCase()}">${b.status}</span></td>
+                <td>R ${b.totalCost.toLocaleString()}</td>
+            </tr>
+        `).join('');
+
+        // booking stats summary
+        const totalBookings = bookingsData.length;
+        const confirmed = bookingsData.filter(b => b.status === 'Confirmed').length;
+        const pending = bookingsData.filter(b => b.status === 'Pending').length;
+        const cancelled = bookingsData.filter(b => b.status === 'Cancelled').length;
+        document.getElementById('bookingStats').innerHTML = `
+            <div class="stat-card"><div class="stat-title">Total Reservations</div><div class="stat-value">${totalBookings}</div></div>
+            <div class="stat-card"><div class="stat-title">Confirmed</div><div class="stat-value">${confirmed}</div></div>
+            <div class="stat-card"><div class="stat-title">Pending Payment</div><div class="stat-value">${pending}</div></div>
+            <div class="stat-card"><div class="stat-title">Cancelled</div><div class="stat-value">${cancelled}</div></div>
+        `;
+    }
+
+    // Payments rendering
+    function renderPayments() {
+        const searchTerm = document.getElementById('paymentSearch').value.toLowerCase();
+        let filtered = paymentsData.filter(p => 
+            p.invoiceNo.toLowerCase().includes(searchTerm) || 
+            p.guestName.toLowerCase().includes(searchTerm) || 
+            p.bookingId.toLowerCase().includes(searchTerm)
+        );
+        const tbody = document.getElementById('paymentsTableBody');
+        tbody.innerHTML = filtered.map(p => `
+            <tr>
+                <td><i class="fas fa-receipt"></i> ${p.invoiceNo}</td>
+                <td>${p.bookingId}</td>
+                <td>${p.guestName}</td>
+                <td>R ${p.amount.toLocaleString()}</td>
+                <td>${p.method}</td>
+                <td>${p.paymentDate || '—'}</td>
+                <td><span class="payment-status payment-${p.status.toLowerCase()}">${p.status}</span></td>
+            </tr>
+        `).join('');
+
+        const totalPaid = paymentsData.filter(p => p.status === 'Paid').reduce((acc, cur) => acc + cur.amount, 0);
+        const totalPending = paymentsData.filter(p => p.status === 'Pending').reduce((acc, cur) => acc + cur.amount, 0);
+        const totalRefunded = paymentsData.filter(p => p.status === 'Refunded').reduce((acc, cur) => acc + cur.amount, 0);
+        document.getElementById('paymentStats').innerHTML = `
+            <div class="stat-card"><div class="stat-title">Total Revenue (Paid)</div><div class="stat-value">R ${totalPaid.toLocaleString()}</div></div>
+            <div class="stat-card"><div class="stat-title">Pending Collection</div><div class="stat-value">R ${totalPending.toLocaleString()}</div></div>
+            <div class="stat-card"><div class="stat-title">Refunded Amount</div><div class="stat-value">R ${totalRefunded.toLocaleString()}</div></div>
+            <div class="stat-card"><div class="stat-title">Transactions</div><div class="stat-value">${paymentsData.length}</div></div>
+        `;
+    }
+
+    // ================ EVENT LISTENERS & FILTERS ================
+    function bindEvents() {
+        document.getElementById('roomSearch').addEventListener('input', updateRoomDisplay);
+        document.getElementById('roomStatusFilter').addEventListener('change', updateRoomDisplay);
+        document.getElementById('bookingSearch').addEventListener('input', renderBookings);
+        document.getElementById('bookingStatusFilter').addEventListener('change', renderBookings);
+        document.getElementById('paymentSearch').addEventListener('input', renderPayments);
+    }
+
+    // TABS logic
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panels = document.querySelectorAll('.tab-panel');
+        tabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                btn.classList.add('active');
+                panels.forEach(panel => panel.classList.remove('active-panel'));
+                if (targetId === 'availability') document.getElementById('availabilityPanel').classList.add('active-panel');
+                if (targetId === 'bookings') document.getElementById('bookingsPanel').classList.add('active-panel');
+                if (targetId === 'payments') document.getElementById('paymentsPanel').classList.add('active-panel');
+                updateRoomDisplay();
+                renderBookings();
+                renderPayments();
+            });
+        });
+    }
+
+    // initial load
+    function init() {
+        updateRoomDisplay();
+        renderBookings();
+        renderPayments();
+        bindEvents();
+        initTabs();
+    }
+
+    init();
+</script>
+</body>
+</html>
