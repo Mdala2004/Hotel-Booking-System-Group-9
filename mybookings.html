@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings | Hotel Transylvania</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0d0a14; --bg-dark: #1a0f2e; --bg-card: #1e1335; --bg-card-hover: #281a45;
+            --purple-mid: #3d2a5c; --gold: #c8a84e; --gold-light: #e0c878; --red-accent: #8b1a2b;
+            --red-bright: #b81c36; --cream: #f0e6d3; --cream-dark: #d5c8b0; --text-light: #e8e0d5;
+            --text-muted: #b0a595; --border-gold: rgba(200, 168, 78, 0.4); --shadow-gold: rgba(200, 168, 78, 0.25);
+            --shadow-dark: rgba(0, 0, 0, 0.6); --font-gothic: 'Cinzel', 'Cinzel Decorative', serif;
+            --font-body: 'Inter', 'Playfair Display', serif; --transition-fast: 0.25s ease;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg-deep); color: var(--text-light); font-family: var(--font-body);
+            min-height: 100vh; background-image: radial-gradient(ellipse at 20% 20%, rgba(100,40,120,0.12) 0%, transparent 60%),
+                              radial-gradient(ellipse at 80% 60%, rgba(180,30,50,0.08) 0%, transparent 55%),
+                              radial-gradient(ellipse at 50% 90%, rgba(200,168,78,0.06) 0%, transparent 50%);
+            background-attachment: fixed; padding-top: 90px;
+        }
+        .navbar {
+            position: fixed; top:0; left:0; right:0; z-index:1000; display: flex;
+            align-items: center; justify-content: space-between; padding:12px 40px;
+            background: linear-gradient(180deg, rgba(13,10,20,0.97) 60%, rgba(13,10,20,0.7) 100%);
+            backdrop-filter: blur(12px); border-bottom:1px solid var(--border-gold); min-height:70px;
+        }
+        .nav-logo-section { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+        .nav-logo-text { font-family: var(--font-gothic); font-size:1.2rem; font-weight:700; color:var(--gold); letter-spacing:1.5px; text-shadow:0 0 20px var(--shadow-gold); }
+        .nav-links { display: flex; gap:24px; list-style: none; }
+        .nav-links a { font-family: var(--font-gothic); font-size:0.85rem; font-weight:500; color:var(--cream-dark); text-decoration:none; letter-spacing:1px; transition: color var(--transition-fast); }
+        .nav-links a:hover { color: var(--gold-light); }
+        .btn-signin { font-family: var(--font-gothic); font-size:0.85rem; font-weight:600; letter-spacing:1px; padding:10px 22px; background:transparent; color:var(--gold); border:1.5px solid var(--gold); border-radius:4px; cursor:pointer; transition:all var(--transition-fast); white-space:nowrap; }
+        .btn-signin:hover { background:var(--gold); color:var(--bg-deep); box-shadow:0 0 25px var(--shadow-gold); }
+        .container { max-width:1100px; margin:0 auto; padding:30px 40px; }
+        .section-title { font-family: var(--font-gothic); font-size:2rem; font-weight:700; color:var(--gold); letter-spacing:2px; margin-bottom:30px; text-align:center; text-shadow:0 0 15px var(--shadow-gold); }
+        .card { background: var(--bg-card); border:1px solid var(--border-gold); border-radius:10px; padding:30px; box-shadow:0 10px 30px var(--shadow-dark); }
+        .booking-list { display: flex; flex-direction: column; gap:18px; }
+        .booking-item { background: var(--bg-dark); border-left:4px solid var(--gold); padding:20px; border-radius:6px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; transition: all var(--transition-fast); }
+        .booking-item:hover { background: var(--bg-card-hover); border-left-color: var(--gold-light); }
+        .booking-info h4 { color: var(--gold); font-family: var(--font-gothic); margin-bottom:6px; }
+        .booking-info p { margin:3px 0; font-size:0.9rem; }
+        .booking-info .date-range { color: var(--gold-light); font-weight:500; }
+        .status-badge { padding:6px 14px; border-radius:20px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+        .status-badge.Confirmed { background:#2d6a3f; color:#e0ffe0; }
+        .status-badge.Cancelled { background:#5a1a1a; color:#ffb3b3; }
+        .status-badge.Pending { background:#8b6914; color:#fff; }
+        .empty-state { text-align:center; color:var(--text-muted); padding:30px; }
+        .toast { position:fixed; bottom:30px; right:30px; z-index:3000; padding:14px 22px; border-radius:6px; font-family:var(--font-gothic); font-size:0.85rem; font-weight:600; color:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.5); animation: toastIn 0.4s ease; }
+        .toast.success { background:#2d6a3f; } .toast.error { background:var(--red-accent); } .toast.info { background:#3d2a5c; }
+        @keyframes toastIn { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:translateX(0); } }
+        .loading-spinner { display:inline-block; width:20px; height:20px; border:3px solid rgba(200,168,78,0.3); border-top:3px solid var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-logo-section" onclick="window.location.href='index.html'"><span class="nav-logo-text">🏰 HOTEL TRANSYLVANIA</span></div>
+    <ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="booking.html">Book Now</a></li><li><a href="mybookings.html">My Bookings</a></li></ul>
+    <button class="btn-signin" id="userStatusBtn" onclick="handleAuthAction()">SIGN IN</button>
+</nav>
+<div class="container">
+    <h2 class="section-title">📜 My Bookings</h2>
+    <div class="card"><div id="bookingsContainer"><div class="loading-spinner"></div> Loading reservations...</div></div>
+</div>
+<div id="toastContainer"></div>
+<script>
+    const API_BASE = 'http://localhost:3000';
+    let authToken = localStorage.getItem('authToken');
+    let userData = null;
+    try { userData = JSON.parse(localStorage.getItem('userData')); } catch(e) {}
+    if(!authToken || !userData) window.location.href = 'index.html';
+
+    function showToast(msg,type='info') { const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg; document.getElementById('toastContainer').appendChild(t); setTimeout(()=>t.remove(),3200); }
+    function updateAuthUI() {
+        const btn=document.getElementById('userStatusBtn');
+        if(authToken && userData) btn.textContent = `👤 ${(userData.FIRST_NAME||'Guest').split(' ')[0]} (Logout)`;
+        else btn.textContent='SIGN IN';
+        btn.onclick = () => { if(confirm('Logout?')) { localStorage.clear(); window.location.href='index.html'; } };
+    }
+    function handleAuthAction() { updateAuthUI(); } // just to avoid errors
+    function formatDateZA(iso) { if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+
+    async function loadBookings() {
+        const container = document.getElementById('bookingsContainer');
+        try {
+            const res = await fetch(`${API_BASE}/reservation`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+            if(!res.ok) throw new Error();
+            const allRes = await res.json();
+            const myRes = allRes.filter(r => r.GUEST_ID === userData.GUEST_ID);
+            if(myRes.length === 0) { container.innerHTML = '<div class="empty-state">No bookings found.</div>'; return; }
+            let html = '<div class="booking-list">';
+            myRes.forEach(r => {
+                const statusClass = r.PAYMENT_STATUS === 'Confirmed' ? 'Confirmed' : (r.PAYMENT_STATUS === 'Cancelled' ? 'Cancelled' : 'Pending');
+                html += `<div class="booking-item">
+                            <div class="booking-info">
+                                <h4>Room ${r.ROOM_ID}</h4>
+                                <p class="date-range">📅 ${formatDateZA(r.CHECK_IN_DATE)} → ${formatDateZA(r.CHECK_OUT_DATE)}</p>
+                                <p>👥 ${r.NUMBER_OF_GUESTS} guest(s) | 💰 R${r.TOTAL_COST}</p>
+                            </div>
+                            <span class="status-badge ${statusClass}">${r.PAYMENT_STATUS}</span>
+                         </div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        } catch(err) {
+            showToast('Could not load bookings.','error');
+            container.innerHTML = '<div class="empty-state">Failed to load.</div>';
+        }
+    }
+    window.addEventListener('load', () => { updateAuthUI(); loadBookings(); });
+</script>
+</body>
+</html>
