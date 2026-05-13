@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal | Hotel Transylvania</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0d0a14; --bg-dark: #1a0f2e; --bg-card: #1e1335; --bg-card-hover: #281a45;
+            --purple-mid: #3d2a5c; --purple-light: #5c3d85; --gold: #c8a84e; --gold-light: #e0c878;
+            --gold-dark: #8b6914; --red-accent: #8b1a2b; --red-bright: #b81c36; --cream: #f0e6d3;
+            --cream-dark: #d5c8b0; --text-light: #e8e0d5; --text-muted: #b0a595;
+            --border-gold: rgba(200, 168, 78, 0.4); --shadow-gold: rgba(200, 168, 78, 0.25);
+            --shadow-dark: rgba(0, 0, 0, 0.6); --font-gothic: 'Cinzel', 'Cinzel Decorative', serif;
+            --font-body: 'Inter', 'Playfair Display', serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg-deep); color: var(--text-light); font-family: var(--font-body);
+            display: flex; min-height: 100vh;
+            background-image: radial-gradient(ellipse at 20% 20%, rgba(100,40,120,0.12) 0%, transparent 60%),
+                              radial-gradient(ellipse at 80% 60%, rgba(180,30,50,0.08) 0%, transparent 55%);
+        }
+        .sidebar {
+            width: 260px; background: rgba(13,10,20,0.95); border-right: 1px solid var(--border-gold);
+            padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10;
+        }
+        .sidebar-logo { font-family: var(--font-gothic); font-size:1.3rem; font-weight:700; color:var(--gold); letter-spacing:2px; margin-bottom:40px; text-align:center; cursor:pointer; }
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap:6px; }
+        .sidebar-menu li a { display: block; padding:12px 15px; color:var(--cream-dark); text-decoration:none; font-family:var(--font-gothic); font-size:0.85rem; letter-spacing:1px; border-radius:6px; transition:all 0.25s ease; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background:var(--bg-card-hover); color:var(--gold-light); border-left:3px solid var(--gold); }
+        .sidebar-footer { margin-top: auto; border-top:1px solid var(--border-gold); padding-top:15px; }
+        .btn-logout { width:100%; background:transparent; color:var(--gold); border:1px solid var(--gold); padding:10px; font-family:var(--font-gothic); cursor:pointer; transition:all 0.2s; }
+        .btn-logout:hover { background:var(--gold); color:#000; }
+        .main-content { margin-left:260px; flex:1; padding:40px; }
+        .section-title { font-family:var(--font-gothic); font-size:1.8rem; color:var(--gold); letter-spacing:2px; margin-bottom:25px; }
+        .card { background:var(--bg-card); border:1px solid var(--border-gold); border-radius:10px; padding:25px; margin-bottom:25px; }
+        .btn-primary { font-family:var(--font-gothic); background:var(--red-accent); color:#fff; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; transition:0.2s; }
+        .btn-primary:hover { background:var(--red-bright); box-shadow:0 0 15px rgba(184,28,54,0.5); }
+        .btn-secondary { font-family:var(--font-gothic); background:transparent; color:var(--gold); border:1px solid var(--gold); padding:8px 16px; border-radius:4px; cursor:pointer; }
+        table { width:100%; border-collapse:collapse; margin-top:15px; }
+        th, td { padding:12px; text-align:left; border-bottom:1px solid var(--border-gold); font-size:0.9rem; }
+        th { color:var(--gold); font-family:var(--font-gothic); }
+        .status-badge { padding:4px 10px; border-radius:12px; font-size:0.7rem; text-transform:uppercase; }
+        .status-badge.Available { background:#2d6a3f; color:#e0ffe0; }
+        .status-badge.Occupied { background:#8b6914; color:#fff; }
+        .status-badge.Maintenance { background:#5a1a1a; color:#ffb3b3; }
+        .toast { position:fixed; bottom:30px; right:30px; z-index:9999; padding:14px 22px; border-radius:6px; font-family:var(--font-gothic); font-size:0.85rem; animation:toastIn 0.4s; }
+        .toast.success { background:#2d6a3f; } .toast.error { background:#8b1a2b; } .toast.info { background:#3d2a5c; }
+        @keyframes toastIn { from{opacity:0;transform:translateX(50px);} to{opacity:1;transform:translateX(0);} }
+        .hidden { display: none; }
+        .loading { text-align:center; padding:30px; }
+    </style>
+</head>
+<body>
+<div class="sidebar"><div class="sidebar-logo" onclick="window.location.href='index.html'">🏰 STAFF</div><ul class="sidebar-menu" id="sidebarMenu"></ul><div class="sidebar-footer"><button class="btn-logout" onclick="logout()">Logout</button></div></div>
+<div class="main-content" id="mainContent">
+    <div id="section-reception" class="hidden"><h2 class="section-title">📋 Reception Desk</h2><div class="card"><div id="receptionReservations">Loading...</div></div></div>
+    <div id="section-housekeeping" class="hidden"><h2 class="section-title">🧹 Housekeeping</h2><div class="card"><div id="roomStatusList">Loading...</div></div></div>
+</div>
+<div id="toastContainer"></div>
+<script>
+    const API_BASE = 'http://localhost:3000';
+    let token = localStorage.getItem('authToken');
+    let userData = null;
+    try { userData = JSON.parse(localStorage.getItem('userData')); } catch(e) {}
+    if(!token || !userData) window.location.href = 'index.html';
+    // staff role detection – we already verified during login that this guest is also in staff table
+    // we'll fetch staff role from /staff using email
+    let staffRole = 'Receptionist';
+    async function getStaffRole() {
+        try {
+            const res = await fetch(`${API_BASE}/staff`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if(res.ok) {
+                const staff = await res.json();
+                const me = staff.find(s => s.EMAIL === userData.EMAIL || s.STAFF_EMAIL === userData.EMAIL);
+                if(me) staffRole = me.ROLE || 'Receptionist';
+            }
+        } catch(e) { console.warn(e); }
+        renderSidebar();
+    }
+    function showToast(msg, type='info') { const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg; document.getElementById('toastContainer').appendChild(t); setTimeout(()=>t.remove(),3000); }
+    function logout() { localStorage.clear(); window.location.href='index.html'; }
+    function renderSidebar() {
+        const menuMap = { Receptionist: [{label:'Reception', section:'reception'}], Housekeeping: [{label:'Housekeeping', section:'housekeeping'}], Manager: [{label:'Reception','section':'reception'},{label:'Housekeeping',section:'housekeeping'}] };
+        const items = menuMap[staffRole] || [{label:'Reception', section:'reception'}];
+        const sidebar = document.getElementById('sidebarMenu');
+        sidebar.innerHTML = items.map(item => `<li><a href="#" onclick="showSection('${item.section}')" data-section="${item.section}">${item.label}</a></li>`).join('');
+        if(items.length) showSection(items[0].section);
+    }
+    function showSection(sectionId) {
+        document.querySelectorAll('.main-content > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById('section-' + sectionId)?.classList.remove('hidden');
+        if(sectionId === 'reception') loadReceptionData();
+        if(sectionId === 'housekeeping') loadRoomStatus();
+    }
+    async function loadReceptionData() {
+        const div = document.getElementById('receptionReservations');
+        div.innerHTML = '<div class="loading">Loading reservations...</div>';
+        try {
+            const res = await fetch(`${API_BASE}/reservation`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if(!res.ok) throw new Error();
+            const reservations = await res.json();
+            if(!reservations.length) { div.innerHTML = '<p>No reservations.</p>'; return; }
+            let html = `<table><tr><th>Guest</th><th>Room</th><th>Dates</th><th>Status</th></tr>`;
+            for(let r of reservations) {
+                const guestRes = await fetch(`${API_BASE}/guests/${r.GUEST_ID}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const guest = await guestRes.json();
+                html += `<tr><td>${guest.FIRST_NAME} ${guest.LAST_NAME}</td><td>${r.ROOM_ID}</td><td>${r.CHECK_IN_DATE} → ${r.CHECK_OUT_DATE}</td><td><span class="status-badge ${r.PAYMENT_STATUS}">${r.PAYMENT_STATUS}</span></td></tr>`;
+            }
+            html += `</table>`;
+            div.innerHTML = html;
+        } catch(err) { div.innerHTML = '<p>Error loading reservations.</p>'; }
+    }
+    async function loadRoomStatus() {
+        const div = document.getElementById('roomStatusList');
+        div.innerHTML = '<div class="loading">Loading rooms...</div>';
+        try {
+            const res = await fetch(`${API_BASE}/rooms`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if(!res.ok) throw new Error();
+            const rooms = await res.json();
+            let html = `<table><tr><th>Room #</th><th>Type</th><th>Status</th><th>Price</th></tr>`;
+            rooms.forEach(r => {
+                html += `<tr><td>${r.ROOM_NUMBER}</td><td>${r.TYPE_NAME}</td><td><span class="status-badge ${r.STATUS}">${r.STATUS}</span></td><td>R${r.PRICE_PER_NIGHT}</td></tr>`;
+            });
+            html += `</table>`;
+            div.innerHTML = html;
+        } catch(err) { div.innerHTML = '<p>Error loading rooms.</p>'; }
+    }
+    getStaffRole();
+</script>
+</body>
+</html>
