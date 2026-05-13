@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Hotel Transylvania | Secure Payment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #e9f0fc 0%, #d9e4f5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0) 70%);
+            top: 10%;
+            left: -100px;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, rgba(56,189,248,0) 70%);
+            bottom: 0;
+            right: -120px;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .payment-container {
+            max-width: 620px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .payment-card {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 18px rgba(0, 0, 0, 0.05);
+            padding: 2rem 1.8rem 2.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .payment-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #3886b6, #31e2e2);
+            width: 64px;
+            height: 64px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 28px;
+            box-shadow: 0 12px 18px -8px rgba(79, 70, 229, 0.4);
+            margin-bottom: 0.8rem;
+        }
+
+        .brand-icon i {
+            font-size: 2rem;
+            color: rgb(72, 68, 68);
+        }
+
+        .brand h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e293b, #2d3a5e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .brand p {
+            color: #5b6e8c;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        .summary-box {
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-title {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .summary-details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-label {
+            color: #64748b;
+            font-size: 0.7rem;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .total-amount {
+            margin-top: 0.8rem;
+            padding-top: 0.7rem;
+            border-top: 1px dashed #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .method-selector {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0 1.2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .method-option {
+            flex: 1;
+            background: #f1f5f9;
+            border-radius: 1.2rem;
+            padding: 0.7rem;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .method-option i {
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .method-option.selected {
+            background: white;
+            border-color: #4f46e5;
+            box-shadow: 0 4px 10px rgba(79,70,229,0.15);
+        }
+
+        /* Dynamic payment sections - each unique */
+        .payment-section {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #fefefe;
+            border-radius: 1.2rem;
+            border: 1px solid #e2e8f0;
+            transition: 0.2s;
+        }
+
+        .payment-section.active-section {
+            display: block;
+            animation: fadeSlide 0.25s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .input-group i.icon-left {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 2.4rem;
+            font-size: 0.9rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1.2rem;
+            background: white;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .row-2cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .bank-details {
+            background: #f0f9ff;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
+        }
+
+        .bank-details p {
+            margin: 0.3rem 0;
+        }
+
+        .pay-btn {
+            background: linear-gradient(105deg, #4f46e5 0%, #6366f1 100%);
+            width: 100%;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-top: 1rem;
+        }
+
+        .pay-btn:hover {
+            background: linear-gradient(105deg, #4338ca 0%, #4f46e5 100%);
+            transform: scale(0.98);
+        }
+
+        .message-area {
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 2rem;
+        }
+
+        .error-msg {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .success-msg {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .info-note {
+            font-size: 0.7rem;
+            color: #6c86a3;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        hr {
+            margin: 0.8rem 0;
+            border: none;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+<div class="payment-container">
+    <div class="payment-card">
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fas fa-house-chimney"></i>
+            </div>
+            <h1>Complete Your Payment</h1>
+            <p>Secure checkout • Hotel Transylvania</p>
+        </div>
+
+        <!-- Reservation Summary -->
+        <div class="summary-box" id="summaryBox"></div>
+
+        <!-- Payment Method Selector -->
+        <div class="summary-title"><i class="fas fa-wallet"></i> Select Payment Method</div>
+        <div class="method-selector" id="methodSelector">
+            <div class="method-option" data-method="credit_debit">
+                <i class="fab fa-cc-visa"></i> <span>Card (Credit/Debit)</span>
+            </div>
+            <div class="method-option" data-method="eft">
+                <i class="fas fa-university"></i> <span>EFT / Bank Transfer</span>
+            </div>
+            <div class="method-option" data-method="cash">
+                <i class="fas fa-money-bill-wave"></i> <span>Cash (at hotel)</span>
+            </div>
+        </div>
+
+        <!-- ========== UNIQUE PAYMENT SECTIONS ========== -->
+        <!-- 1) Credit/Debit Card Section (traditional card form) -->
+        <div id="creditDebitSection" class="payment-section">
+            <div class="input-group">
+                <i class="fas fa-user icon-left"></i>
+                <input type="text" id="cardholderName" placeholder="Cardholder full name" autocomplete="cc-name">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-credit-card icon-left"></i>
+                <input type="text" id="cardNumber" placeholder="Card number (16 digits)" maxlength="19" autocomplete="cc-number">
+            </div>
+            <div class="row-2cols">
+                <div class="input-group">
+                    <i class="fas fa-calendar-alt icon-left"></i>
+                    <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock icon-left"></i>
+                    <input type="text" id="cvv" placeholder="CVV" maxlength="4">
+                </div>
+            </div>
+            <button type="button" class="pay-btn" id="payCardBtn"><i class="fas fa-lock"></i> Pay with Card</button>
+        </div>
+
+        <!-- 2) EFT / Bank Transfer Section (unique: shows bank details + proof upload reference) -->
+        <div id="eftSection" class="payment-section">
+            <div class="bank-details">
+                <p><i class="fas fa-building"></i> <strong>Hotel Transylvania – Official Bank Account</strong></p>
+                <p><i class="fas fa-university"></i> Bank: First National Bank (FNB)</p>
+                <p><i class="fas fa-user"></i> Account Holder: Hotel Transylvania (Pty) Ltd</p>
+                <p><i class="fas fa-credit-card"></i> Account Number: 6284 950 1234</p>
+                <p><i class="fas fa-code-branch"></i> Branch Code: 250655</p>
+                <p><i class="fas fa-globe"></i> Reference: Use your <strong>Booking ID</strong> (B1007)</p>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user-check icon-left"></i>
+                <input type="text" id="eftAccountHolder" placeholder="Account holder name (as per bank)">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-hashtag icon-left"></i>
+                <input type="text" id="eftReference" placeholder="Your unique reference / Booking ID" value="B1007">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-calendar-week icon-left"></i>
+                <input type="date" id="eftTransferDate" placeholder="Transfer date">
+            </div>
+            <button type="button" class="pay-btn" id="payEftBtn"><i class="fas fa-upload"></i> Confirm EFT Payment</button>
+        </div>
+
+        <!-- 3) Cash at Hotel Section (unique: reservation hold, pay on arrival) -->
+        <div id="cashSection" class="payment-section">
+            <div style="background:#fef9e3; border-radius:1rem; padding:0.9rem; margin-bottom:1rem;">
+                <p><i class="fas fa-hotel"></i> <strong>Pay upon arrival</strong></p>
+                <p style="font-size:0.8rem; margin-top:5px;">You can settle the total amount in cash at the hotel reception during check-in. Your room will be held for you. Please present your Booking ID.</p>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-user icon-left"></i>
+                <input type="text" id="cashGuestName" placeholder="Full name (for check-in reference)">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-phone icon-left"></i>
+                <input type="tel" id="cashPhone" placeholder="Contact number">
+            </div>
+            <button type="button" class="pay-btn" id="payCashBtn"><i class="fas fa-check-circle"></i> Confirm Cash Reservation</button>
+        </div>
+
+        <div id="paymentMessage" class="message-area"></div>
+        <div class="info-note">
+            <i class="fas fa-shield-alt"></i> Payment secures your booking. After confirmation, status becomes "Confirmed".
+        </div>
+    </div>
+</div>
+
+<script>
+    // Reservation data (same as previous based on Phase 2)
+    let currentReservation = {
+        bookingId: "B1007",
+        guestName: "Guest User",
+        roomNumber: "004",
+        roomType: "Family Room",
+        checkIn: "2026-06-10",
+        checkOut: "2026-06-15",
+        nights: 5,
+        pricePerNight: 2200,
+        totalCost: 11000,
+        guestEmail: "guest@example.com",
+        status: "Pending"
+    };
+
+    let selectedMethod = "credit_debit";   // track active method
+
+    function formatZAR(amount) {
+        return "R " + amount.toLocaleString();
+    }
+
+    function renderSummary() {
+        document.getElementById('summaryBox').innerHTML = `
+            <div class="summary-title"><i class="fas fa-receipt"></i> Booking Summary</div>
+            <div class="summary-details">
+                <div class="summary-item"><span class="summary-label">Booking ID</span><span class="summary-value">${currentReservation.bookingId}</span></div>
+                <div class="summary-item"><span class="summary-label">Room</span><span class="summary-value">${currentReservation.roomNumber} · ${currentReservation.roomType}</span></div>
+                <div class="summary-item"><span class="summary-label">Check-in</span><span class="summary-value">${currentReservation.checkIn}</span></div>
+                <div class="summary-item"><span class="summary-label">Check-out</span><span class="summary-value">${currentReservation.checkOut}</span></div>
+                <div class="summary-item"><span class="summary-label">Nights</span><span class="summary-value">${currentReservation.nights}</span></div>
+                <div class="summary-item"><span class="summary-label">Rate/night</span><span class="summary-value">${formatZAR(currentReservation.pricePerNight)}</span></div>
+            </div>
+            <div class="total-amount"><span>Total Amount Due:</span><span style="font-size:1.2rem;">${formatZAR(currentReservation.totalCost)}</span></div>
+        `;
+    }
+
+    function showMessage(msg, isError) {
+        const msgDiv = document.getElementById('paymentMessage');
+        msgDiv.innerHTML = msg;
+        msgDiv.className = `message-area ${isError ? 'error-msg' : 'success-msg'}`;
+        if (!isError) {
+            setTimeout(() => {
+                if (msgDiv.innerHTML === msg) msgDiv.innerHTML = '';
+            }, 4500);
+        }
+    }
+
+    // disable all inputs after success
+    function disableAllSections() {
+        document.querySelectorAll('#creditDebitSection input, #eftSection input, #cashSection input').forEach(inp => inp.disabled = true);
+        document.querySelectorAll('.method-option').forEach(opt => opt.style.pointerEvents = 'none');
+        const btns = ['payCardBtn', 'payEftBtn', 'payCashBtn'];
+        btns.forEach(id => {
+            let btn = document.getElementById(id);
+            if(btn) btn.disabled = true;
+        });
+    }
+
+    // Generic payment success (updates booking status, shows invoice)
+    function finalizePayment(methodName, extraInfo = '') {
+        if (currentReservation.status === 'Confirmed') {
+            showMessage(`Booking already confirmed.`, false);
+            return;
+        }
+        currentReservation.status = "Confirmed";
+        const invoiceNo = "INV-" + Date.now();
+        showMessage(`✅ ${methodName} successful! Booking ${currentReservation.bookingId} CONFIRMED. Invoice: ${invoiceNo}. ${extraInfo}`, false);
+        disableAllSections();
+    }
+
+    // ----- CREDIT/DEBIT CARD validation (unique flow)-----
+    function validateCard() {
+        const name = document.getElementById('cardholderName').value.trim();
+        const cardRaw = document.getElementById('cardNumber').value.replace(/\s/g, '');
+        const expiry = document.getElementById('expiry').value;
+        const cvv = document.getElementById('cvv').value;
+        if (!name || name.length < 3) return "Enter valid cardholder name.";
+        if (!/^\d{13,19}$/.test(cardRaw)) return "Card number must be 13-19 digits.";
+        if (!/^\d{2}\/\d{2}$/.test(expiry)) return "Expiry format MM/YY.";
+        const [month, year] = expiry.split('/');
+        const currentYear = new Date().getFullYear() % 100;
+        const currentMonth = new Date().getMonth() + 1;
+        if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth))
+            return "Card expired.";
+        if (!/^\d{3,4}$/.test(cvv)) return "Invalid CVV.";
+        return null;
+    }
+
+    function handleCardPayment() {
+        const error = validateCard();
+        if (error) { showMessage(error, true); return; }
+        finalizePayment("Card Payment", "Your card has been charged securely.");
+    }
+
+    // ----- EFT unique: check reference & date -----
+    function handleEftPayment() {
+        const accountHolder = document.getElementById('eftAccountHolder').value.trim();
+        const reference = document.getElementById('eftReference').value.trim();
+        const transferDate = document.getElementById('eftTransferDate').value;
+        if (!accountHolder) { showMessage("Please enter the bank account holder name.", true); return; }
+        if (!reference) { showMessage("Please enter your booking reference (Booking ID).", true); return; }
+        if (!transferDate) { showMessage("Please select the transfer date.", true); return; }
+        // optional: match reference to current booking id
+        if (!reference.includes(currentReservation.bookingId) && reference !== currentReservation.bookingId) {
+            showMessage(`Reference must match your Booking ID (${currentReservation.bookingId}) for verification.`, true);
+            return;
+        }
+        finalizePayment("EFT Bank Transfer", "Our team will verify the transfer within 24h. Your room is tentatively reserved.");
+    }
+
+    // ----- Cash at hotel: unique (pay on arrival, no card details) -----
+    function handleCashPayment() {
+        const fullName = document.getElementById('cashGuestName').value.trim();
+        const phone = document.getElementById('cashPhone').value.trim();
+        if (!fullName) { showMessage("Please enter your full name for check-in reference.", true); return; }
+        if (!phone || phone.length < 8) { showMessage("Please provide a valid contact number.", true); return; }
+        finalizePayment("Cash on Arrival", "You will pay at reception. Your room is now reserved.");
+    }
+
+    // ----- SWITCH BETWEEN PAYMENT SECTIONS (unique UI swapping) -----
+    function switchPaymentMethod(methodId) {
+        selectedMethod = methodId;
+        // hide all sections
+        document.getElementById('creditDebitSection').classList.remove('active-section');
+        document.getElementById('eftSection').classList.remove('active-section');
+        document.getElementById('cashSection').classList.remove('active-section');
+        if (methodId === 'credit_debit') {
+            document.getElementById('creditDebitSection').classList.add('active-section');
+        } else if (methodId === 'eft') {
+            document.getElementById('eftSection').classList.add('active-section');
+            // prefill reference with booking id for consistency
+            document.getElementById('eftReference').value = currentReservation.bookingId;
+        } else if (methodId === 'cash') {
+            document.getElementById('cashSection').classList.add('active-section');
+        }
+        // clear any old message when switching
+        document.getElementById('paymentMessage').innerHTML = '';
+        document.getElementById('paymentMessage').className = 'message-area';
+    }
+
+    // Initialize method selector and UI events
+    function initMethods() {
+        const options = document.querySelectorAll('.method-option');
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                options.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                const methodVal = opt.getAttribute('data-method');
+                switchPaymentMethod(methodVal);
+            });
+        });
+        // default: credit/debit active
+        document.querySelector('.method-option[data-method="credit_debit"]').classList.add('selected');
+        switchPaymentMethod('credit_debit');
+    }
+
+    // attach button listeners
+    function attachButtonListeners() {
+        document.getElementById('payCardBtn').addEventListener('click', handleCardPayment);
+        document.getElementById('payEftBtn').addEventListener('click', handleEftPayment);
+        document.getElementById('payCashBtn').addEventListener('click', handleCashPayment);
+    }
+
+    // card number formatting only for credit section
+    function formatCardNumber(value) {
+        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+        const parts = [];
+        for (let i = 0; i < v.length && i < 16; i += 4) parts.push(v.substring(i, i+4));
+        return parts.join(' ');
+    }
+    function handleCardNumberInput(e) {
+        let input = e.target;
+        let formatted = formatCardNumber(input.value);
+        input.value = formatted;
+    }
+    function handleExpiryInput(e) {
+        let val = e.target.value.replace(/\D/g, '');
+        if (val.length >= 2) val = val.slice(0,2) + '/' + val.slice(2,4);
+        e.target.value = val;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderSummary();
+        initMethods();
+        attachButtonListeners();
+        const cardNum = document.getElementById('cardNumber');
+        if(cardNum) cardNum.addEventListener('input', handleCardNumberInput);
+        const expiryField = document.getElementById('expiry');
+        if(expiryField) expiryField.addEventListener('input', handleExpiryInput);
+    });
+</script>
+</body>
+</html>
