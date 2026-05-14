@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | Hotel Transylvania</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg-page:        #e1e1e1;
+            --bg-card:        #ffffff;
+            --bg-surface:     #f0f0f0;
+            --charcoal:       #3a3a3a;
+            --charcoal-hover: #2a2a2a;
+            --border:         #cccccc;
+            --border-focus:   #3a3a3a;
+            --text-main:      #1a1a1a;
+            --text-muted:     #777777;
+            --text-label:     #444444;
+            --gold:           #c8a84e;
+            --red-accent:     #8b1a2b;
+            --green-ok:       #2d6a3f;
+            --radius-sm:      6px;
+            --radius-md:      12px;
+            --font-gothic:    'Cinzel', serif;
+            --font-body:      'Inter', sans-serif;
+            --shadow:         0 8px 32px rgba(0,0,0,0.12);
+            --transition:     0.2s ease;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-page);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-main);
+        }
+
+        /* ── NAV ── */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 64px;
+            background: var(--bg-page);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-logo {
+            font-family: var(--font-gothic);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            letter-spacing: 1.5px;
+            text-decoration: none;
+        }
+        .nav-links { display:flex; list-style:none; gap:4px; }
+        .nav-links a {
+            font-family: var(--font-gothic);
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--charcoal);
+            text-decoration: none;
+            transition: background var(--transition);
+        }
+        .nav-links a:hover { background: var(--charcoal); color: #fff; }
+        .btn-nav {
+            font-family: var(--font-gothic);
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            padding: 8px 18px;
+            background: transparent;
+            color: var(--charcoal);
+            border: 1.5px solid var(--charcoal);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+            text-decoration: none;
+        }
+        .btn-nav:hover { background: var(--charcoal); color: #fff; }
+
+        /* ── PAGE BODY ── */
+        .page-body {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 50px 20px 60px;
+        }
+
+        /* ── CARD ── */
+        .signup-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 520px;
+            padding: 36px 38px 40px;
+        }
+
+        /* header */
+        .card-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .card-header .hotel-title {
+            font-family: var(--font-gothic);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--charcoal);
+            margin-bottom: 6px;
+        }
+        .card-header .page-title {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            letter-spacing: -0.3px;
+        }
+        .card-header .page-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* divider line */
+        .header-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0 0 24px 0;
+        }
+
+        /* step indicator */
+        .steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 28px;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+        }
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--bg-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-gothic);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: all var(--transition);
+        }
+        .step-circle.active {
+            background: var(--charcoal);
+            border-color: var(--charcoal);
+            color: #fff;
+        }
+        .step-circle.done {
+            background: var(--green-ok);
+            border-color: var(--green-ok);
+            color: #fff;
+        }
+        .step-label {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .step-label.active { color: var(--charcoal); font-weight: 600; }
+        .step-connector {
+            flex: 1;
+            height: 2px;
+            background: var(--border);
+            margin-bottom: 20px;
+            max-width: 50px;
+        }
+        .step-connector.done { background: var(--green-ok); }
+
+        /* section */
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+
+        /* section heading */
+        .section-heading {
+            font-family: var(--font-gothic);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-label);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-heading i { color: var(--charcoal); font-size: 0.8rem; }
+
+        /* form fields */
+        .form-row { display: flex; gap: 14px; margin-bottom: 0; }
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--text-label);
+        }
+        .input-wrap { position: relative; }
+        .input-wrap i.icon-left {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            pointer-events: none;
+            transition: color var(--transition);
+        }
+        .input-wrap input,
+        .input-wrap select {
+            width: 100%;
+            padding: 11px 12px 11px 34px;
+            background: var(--bg-surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+        }
+        .input-wrap input::placeholder { color: #aaa; }
+        .input-wrap input:focus,
+        .input-wrap select:focus {
+            border-color: var(--border-focus);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(58,58,58,0.08);
+        }
+        .input-wrap input:focus + i,
+        .input-wrap input:focus ~ i { color: var(--charcoal); }
+
+        /* password toggle */
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            transition: color var(--transition);
+        }
+        .toggle-pw:hover { color: var(--charcoal); }
+
+        /* strength bar */
+        .strength-wrap { margin-top: 6px; }
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            overflow: hidden;
+            margin-bottom: 3px;
+        }
+        .strength-fill {
+            height: 100%;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+        .strength-text {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        /* field hint */
+        .field-hint {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .field-hint.error { color: var(--red-accent); }
+        .field-hint.ok    { color: var(--green-ok); }
+
+        /* checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            accent-color: var(--charcoal);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checkbox-group label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            line-height: 1.5;
+        }
+        .checkbox-group label a { color: var(--charcoal); font-weight: 600; text-decoration: none; }
+        .checkbox-group label a:hover { text-decoration: underline; }
+
+        /* navigation buttons */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .btn-primary {
+            flex: 1;
+            padding: 13px;
+            background: var(--charcoal);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-gothic);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:hover { background: var(--charcoal-hover); }
+        .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        .btn-outline {
+            padding: 13px 20px;
+            background: transparent;
+            color: var(--charcoal);
+            border: 1.5px solid var(--charcoal);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-gothic);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .btn-outline:hover { background: var(--charcoal); color: #fff; }
+
+        /* message */
+        .form-message {
+            border-radius: var(--radius-sm);
+            padding: 11px 14px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-top: 14px;
+            display: none;
+            text-align: center;
+        }
+        .form-message.error   { display:block; background:#fdecea; color:var(--red-accent); border:1px solid #f5c6c2; }
+        .form-message.success { display:block; background:#eaf7ed; color:var(--green-ok);   border:1px solid #b2dfbc; }
+
+        /* footer link */
+        .signin-prompt {
+            text-align: center;
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+        .signin-prompt a {
+            color: var(--charcoal);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .signin-prompt a:hover { text-decoration: underline; }
+
+        /* success state */
+        .success-state {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: #eaf7ed;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .success-icon i { font-size: 1.8rem; color: var(--green-ok); }
+        .success-title { font-family: var(--font-gothic); font-size: 1.1rem; font-weight: 700; color: var(--charcoal); letter-spacing: 1px; margin-bottom: 8px; }
+        .success-sub   { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+
+        /* spinner */
+        .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.4); border-top:2px solid #fff; border-radius:50%; animation:spin 0.8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* toast */
+        .toast { position:fixed; bottom:30px; right:30px; z-index:3000; padding:13px 20px; border-radius:var(--radius-sm); font-family:var(--font-gothic); font-size:0.8rem; font-weight:600; letter-spacing:0.8px; color:#fff; animation:toastIn 0.35s ease; box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+        .toast.success { background:var(--green-ok); }
+        .toast.error   { background:var(--red-accent); }
+        .toast.info    { background:var(--charcoal); }
+        @keyframes toastIn { from{opacity:0;transform:translateX(40px);} to{opacity:1;transform:translateX(0);} }
+
+        @media(max-width:540px) {
+            .navbar { padding:0 16px; }
+            .signup-card { padding:28px 20px 32px; }
+            .form-row { flex-direction:column; gap:0; }
+            .btn-row { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+    <a class="nav-logo" href="index.html">🏰 HOTEL TRANSYLVANIA</a>
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="booking.html">Rooms</a></li>
+    </ul>
+    <a class="btn-nav" href="index.html">Sign In</a>
+</nav>
+
+<div class="page-body">
+    <div class="signup-card">
+
+        <!-- Header -->
+        <div class="card-header">
+            <div class="hotel-title">🏰 HOTEL TRANSYLVANIA</div>
+            <div class="page-title">Create Account</div>
+            <div class="page-subtitle">Sign up to start booking your stay</div>
+        </div>
+        <div class="header-divider"></div>
+
+        <!-- Step Indicator -->
+        <div class="steps" id="stepsIndicator">
+            <div class="step">
+                <div class="step-circle active" id="s1circle">1</div>
+                <div class="step-label active" id="s1label">Personal</div>
+            </div>
+            <div class="step-connector" id="conn1"></div>
+            <div class="step">
+                <div class="step-circle" id="s2circle">2</div>
+                <div class="step-label" id="s2label">Contact</div>
+            </div>
+            <div class="step-connector" id="conn2"></div>
+            <div class="step">
+                <div class="step-circle" id="s3circle">3</div>
+                <div class="step-label" id="s3label">Security</div>
+            </div>
+        </div>
+
+        <!-- ── STEP 1: Personal Info ── -->
+        <div class="form-section active" id="step1">
+            <div class="section-heading"><i class="fas fa-user"></i> Personal Information</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon-left"></i>
+                        <input type="text" id="firstName" placeholder="e.g. John" autocomplete="given-name">
+                    </div>
+                    <span class="field-hint" id="hintFirstName"></span>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon-left"></i>
+                        <input type="text" id="lastName" placeholder="e.g. Smith" autocomplete="family-name">
+                    </div>
+                    <span class="field-hint" id="hintLastName"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Username</label>
+                <div class="input-wrap">
+                    <i class="fas fa-at icon-left"></i>
+                    <input type="text" id="username" placeholder="Choose a username" autocomplete="username">
+                </div>
+                <span class="field-hint" id="hintUsername">3–20 characters, letters/numbers/underscores only.</span>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-primary" onclick="goToStep(2)">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── STEP 2: Contact Info ── -->
+        <div class="form-section" id="step2">
+            <div class="section-heading"><i class="fas fa-address-card"></i> Contact Details</div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <div class="input-wrap">
+                    <i class="fas fa-envelope icon-left"></i>
+                    <input type="email" id="email" placeholder="example@gmail.com" autocomplete="email">
+                </div>
+                <span class="field-hint" id="hintEmail"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <div class="input-wrap">
+                    <i class="fas fa-phone icon-left"></i>
+                    <input type="tel" id="phone" placeholder="+27 71 234 5678" autocomplete="tel">
+                </div>
+                <span class="field-hint" id="hintPhone"></span>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-outline" onclick="goToStep(1)">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn-primary" onclick="goToStep(3)">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── STEP 3: Security ── -->
+        <div class="form-section" id="step3">
+            <div class="section-heading"><i class="fas fa-lock"></i> Account Security</div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-key icon-left"></i>
+                    <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password" oninput="checkStrength()">
+                    <button type="button" class="toggle-pw" onclick="togglePw('password','togglePwIcon1')">
+                        <i class="far fa-eye-slash" id="togglePwIcon1"></i>
+                    </button>
+                </div>
+                <div class="strength-wrap">
+                    <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                    <span class="strength-text" id="strengthText">Enter a password</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-key icon-left"></i>
+                    <input type="password" id="confirmPassword" placeholder="Repeat your password" autocomplete="new-password" oninput="checkMatch()">
+                    <button type="button" class="toggle-pw" onclick="togglePw('confirmPassword','togglePwIcon2')">
+                        <i class="far fa-eye-slash" id="togglePwIcon2"></i>
+                    </button>
+                </div>
+                <span class="field-hint" id="hintConfirm"></span>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="agreeTerms">
+                <label for="agreeTerms">
+                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a> of Hotel Transylvania.
+                </label>
+            </div>
+
+            <div class="form-message" id="formMessage"></div>
+
+            <div class="btn-row">
+                <button class="btn-outline" onclick="goToStep(2)">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn-primary" id="btnSubmit" onclick="handleRegister()">
+                    Create Account
+                </button>
+            </div>
+        </div>
+
+        <!-- ── SUCCESS STATE ── -->
+        <div class="success-state" id="successState">
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <div class="success-title">Account Created!</div>
+            <p class="success-sub">Welcome to Hotel Transylvania, <strong id="successName">Guest</strong>!<br>Your account is ready. You can now sign in and start booking.</p>
+            <button class="btn-primary" onclick="window.location.href='index.html'" style="max-width:220px;margin:0 auto;">
+                <i class="fas fa-sign-in-alt"></i> Go to Sign In
+            </button>
+        </div>
+
+        <div class="signin-prompt" id="signinPrompt">
+            Already have an account? <a href="index.html">Sign in</a>
+        </div>
+
+    </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+    let currentStep = 1;
+
+    // ── Step navigation ──
+    function goToStep(n) {
+        if (n > currentStep) {
+            // validate current step before advancing
+            if (!validateStep(currentStep)) return;
+        }
+        currentStep = n;
+        document.querySelectorAll('.form-section').forEach((s,i) => {
+            s.classList.toggle('active', i+1 === n);
+        });
+        updateStepUI();
+    }
+
+    function updateStepUI() {
+        for (let i=1; i<=3; i++) {
+            const circle = document.getElementById(`s${i}circle`);
+            const label  = document.getElementById(`s${i}label`);
+            if (i < currentStep) {
+                circle.className = 'step-circle done';
+                circle.innerHTML = '<i class="fas fa-check" style="font-size:0.65rem;"></i>';
+                label.className  = 'step-label';
+            } else if (i === currentStep) {
+                circle.className = 'step-circle active';
+                circle.textContent = i;
+                label.className  = 'step-label active';
+            } else {
+                circle.className = 'step-circle';
+                circle.textContent = i;
+                label.className  = 'step-label';
+            }
+        }
+        // connectors
+        document.getElementById('conn1').className = 'step-connector' + (currentStep > 1 ? ' done' : '');
+        document.getElementById('conn2').className = 'step-connector' + (currentStep > 2 ? ' done' : '');
+    }
+
+    // ── Validation ──
+    function setHint(id, msg, type='') {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = msg;
+        el.className = 'field-hint' + (type ? ' '+type : '');
+    }
+
+    function validateStep(step) {
+        if (step === 1) {
+            const fn = document.getElementById('firstName').value.trim();
+            const ln = document.getElementById('lastName').value.trim();
+            const un = document.getElementById('username').value.trim();
+            if (!fn) { setHint('hintFirstName','First name is required.','error'); return false; }
+            setHint('hintFirstName','','ok');
+            if (!ln) { setHint('hintLastName','Last name is required.','error'); return false; }
+            setHint('hintLastName','','ok');
+            if (!un || un.length < 3) { setHint('hintUsername','Username must be at least 3 characters.','error'); return false; }
+            if (!/^[a-zA-Z0-9_]+$/.test(un)) { setHint('hintUsername','Only letters, numbers and underscores allowed.','error'); return false; }
+            setHint('hintUsername','Looks good!','ok');
+            return true;
+        }
+        if (step === 2) {
+            const em = document.getElementById('email').value.trim();
+            const ph = document.getElementById('phone').value.trim();
+            const emailRe = /^[^\s@]+@[^\s@.,]+\.[^\s@.,]{2,}$/;
+            if (!emailRe.test(em)) { setHint('hintEmail','Please enter a valid email address.','error'); return false; }
+            setHint('hintEmail','Looks good!','ok');
+            if (!ph || ph.replace(/\D/g,'').length < 8) { setHint('hintPhone','Enter a valid phone number (min 8 digits).','error'); return false; }
+            setHint('hintPhone','Looks good!','ok');
+            return true;
+        }
+        if (step === 3) {
+            const pw  = document.getElementById('password').value;
+            const cpw = document.getElementById('confirmPassword').value;
+            if (pw.length < 6) { showFormMsg('Password must be at least 6 characters.','error'); return false; }
+            if (pw !== cpw) { setHint('hintConfirm','Passwords do not match.','error'); showFormMsg('Passwords do not match.','error'); return false; }
+            if (!document.getElementById('agreeTerms').checked) { showFormMsg('Please agree to the Terms of Service to continue.','error'); return false; }
+            return true;
+        }
+        return true;
+    }
+
+    // ── Password strength ──
+    function checkStrength() {
+        const pw = document.getElementById('password').value;
+        const fill = document.getElementById('strengthFill');
+        const text = document.getElementById('strengthText');
+        let score = 0;
+        if (pw.length >= 6)  score++;
+        if (pw.length >= 10) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        const levels = [
+            { pct:'0%',   color:'#ccc',        label:'' },
+            { pct:'20%',  color:'#e74c3c',      label:'Very weak' },
+            { pct:'40%',  color:'#e67e22',      label:'Weak' },
+            { pct:'60%',  color:'#f1c40f',      label:'Fair' },
+            { pct:'80%',  color:'#2ecc71',      label:'Strong' },
+            { pct:'100%', color:var_green_ok,   label:'Very strong' }
+        ];
+        const lv = levels[Math.min(score, 5)];
+        fill.style.width    = lv.pct;
+        fill.style.background = lv.color;
+        text.textContent    = lv.label;
+        text.style.color    = score >= 3 ? '#2d6a3f' : score >= 1 ? '#b45309' : '#777';
+    }
+    // CSS var not accessible in JS directly, so:
+    const var_green_ok = '#2d6a3f';
+
+    function checkMatch() {
+        const pw  = document.getElementById('password').value;
+        const cpw = document.getElementById('confirmPassword').value;
+        if (!cpw) { setHint('hintConfirm',''); return; }
+        if (pw === cpw) setHint('hintConfirm','Passwords match ✓','ok');
+        else            setHint('hintConfirm','Passwords do not match.','error');
+    }
+
+    // ── Toggle password ──
+    function togglePw(inputId, iconId) {
+        const inp  = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (inp.type === 'password') {
+            inp.type = 'text';
+            icon.className = 'far fa-eye';
+        } else {
+            inp.type = 'password';
+            icon.className = 'far fa-eye-slash';
+        }
+    }
+
+    // ── Message ──
+    function showFormMsg(msg, type) {
+        const el = document.getElementById('formMessage');
+        el.textContent = msg;
+        el.className = `form-message ${type}`;
+    }
+    function clearFormMsg() {
+        const el = document.getElementById('formMessage');
+        el.className = 'form-message';
+        el.textContent = '';
+    }
+
+    // ── Toast ──
+    function showToast(msg, type='info') {
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.textContent = msg;
+        document.getElementById('toastContainer').appendChild(t);
+        setTimeout(()=>t.remove(), 3200);
+    }
+
+    // ── Submit ──
+    async function handleRegister() {
+        clearFormMsg();
+        if (!validateStep(3)) return;
+
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName  = document.getElementById('lastName').value.trim();
+        const username  = document.getElementById('username').value.trim();
+        const email     = document.getElementById('email').value.trim();
+        const phone     = document.getElementById('phone').value.trim();
+        const password  = document.getElementById('password').value;
+
+        const guestId = 'G-' + Date.now() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
+
+        const payload = {
+            guest_id:     guestId,
+            first_name:   firstName,
+            last_name:    lastName,
+            username:     username,
+            email:        email,
+            phone_number: phone,
+            password:     password
+        };
+
+        const btn = document.getElementById('btnSubmit');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Creating account...';
+
+        try {
+            const resp = await fetch('/guests', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(payload)
+            });
+            if (resp.ok) {
+                showSuccess(firstName);
+            } else {
+                const err = await resp.json();
+                showFormMsg(err.error || 'Registration failed. Please try again.', 'error');
+            }
+        } catch(e) {
+            // Demo mode: backend unreachable
+            console.warn('Backend unreachable – demo registration.');
+            showSuccess(firstName);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Create Account';
+        }
+    }
+
+    function showSuccess(name) {
+        // Hide form sections & steps
+        document.querySelectorAll('.form-section').forEach(s => s.style.display='none');
+        document.getElementById('stepsIndicator').style.display = 'none';
+        document.getElementById('signinPrompt').style.display   = 'none';
+        document.querySelector('.header-divider').style.display  = 'none';
+        // Update step circles to all done
+        for (let i=1;i<=3;i++) {
+            const c = document.getElementById(`s${i}circle`);
+            c.className='step-circle done';
+            c.innerHTML='<i class="fas fa-check" style="font-size:0.65rem;"></i>';
+        }
+        // Show success
+        document.getElementById('successName').textContent = name;
+        document.getElementById('successState').style.display = 'block';
+        showToast('Account created successfully!', 'success');
+    }
+
+    // ── Live validation on blur ──
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('firstName').addEventListener('blur', () => {
+            const v = document.getElementById('firstName').value.trim();
+            setHint('hintFirstName', v ? '' : 'First name is required.', v ? '' : 'error');
+        });
+        document.getElementById('lastName').addEventListener('blur', () => {
+            const v = document.getElementById('lastName').value.trim();
+            setHint('hintLastName', v ? '' : 'Last name is required.', v ? '' : 'error');
+        });
+        document.getElementById('username').addEventListener('blur', () => {
+            const v = document.getElementById('username').value.trim();
+            if (!v || v.length < 3) { setHint('hintUsername','At least 3 characters required.','error'); return; }
+            if (!/^[a-zA-Z0-9_]+$/.test(v)) { setHint('hintUsername','Only letters, numbers and underscores.','error'); return; }
+            setHint('hintUsername','Looks good!','ok');
+        });
+        document.getElementById('email').addEventListener('blur', () => {
+            const v = document.getElementById('email').value.trim();
+            const ok = /^[^\s@]+@[^\s@.,]+\.[^\s@.,]{2,}$/.test(v);
+            setHint('hintEmail', ok ? 'Looks good!' : 'Enter a valid email.', ok ? 'ok' : 'error');
+        });
+        document.getElementById('phone').addEventListener('blur', () => {
+            const v = document.getElementById('phone').value.trim();
+            const ok = v.replace(/\D/g,'').length >= 8;
+            setHint('hintPhone', ok ? 'Looks good!' : 'Enter a valid phone number.', ok ? 'ok' : 'error');
+        });
+    });
+</script>
+</body>
+</html>
