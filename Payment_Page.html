@@ -2,611 +2,857 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Hotel Transylvania | Secure Payment</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment | Hotel Transylvania</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-page:    #e1e1e1;
+            --bg-card:    #ffffff;
+            --bg-surface: #f0f0f0;
+            --charcoal:   #3a3a3a;
+            --charcoal-hover: #2a2a2a;
+            --border:     #cccccc;
+            --border-focus: #3a3a3a;
+            --text-main:  #1a1a1a;
+            --text-muted: #777777;
+            --text-label: #444444;
+            --gold:       #c8a84e;
+            --red-accent: #8b1a2b;
+            --green-ok:   #2d6a3f;
+            --radius-sm:  6px;
+            --radius-md:  10px;
+            --font-gothic: 'Cinzel', serif;
+            --font-body:   'Inter', sans-serif;
+            --shadow:      0 4px 20px rgba(0,0,0,0.10);
+            --transition:  0.2s ease;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(145deg, #e9f0fc 0%, #d9e4f5 100%);
+            font-family: var(--font-body);
+            background: var(--bg-page);
             min-height: 100vh;
+            color: var(--text-main);
+            padding: 0 0 60px 0;
+        }
+
+        /* ── NAV ── */
+        .navbar {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            position: relative;
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0) 70%);
-            top: 10%;
-            left: -100px;
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        body::after {
-            content: "";
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, rgba(56,189,248,0) 70%);
-            bottom: 0;
-            right: -120px;
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        .payment-container {
-            max-width: 620px;
-            width: 100%;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .payment-card {
-            background: rgba(255, 255, 255, 0.97);
-            backdrop-filter: blur(2px);
-            border-radius: 2rem;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 18px rgba(0, 0, 0, 0.05);
-            padding: 2rem 1.8rem 2.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: transform 0.2s ease;
-        }
-
-        .payment-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .brand {
-            text-align: center;
-            margin-bottom: 1.8rem;
-        }
-
-        .brand-icon {
-            background: linear-gradient(135deg, #3886b6, #31e2e2);
-            width: 64px;
+            justify-content: space-between;
+            padding: 0 40px;
             height: 64px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 28px;
-            box-shadow: 0 12px 18px -8px rgba(79, 70, 229, 0.4);
-            margin-bottom: 0.8rem;
+            background: var(--bg-page);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-logo {
+            font-family: var(--font-gothic);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .nav-links { display: flex; list-style: none; gap: 4px; }
+        .nav-links a {
+            font-family: var(--font-gothic);
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--charcoal);
+            text-decoration: none;
+            transition: background var(--transition);
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--charcoal);
+            color: #fff;
+        }
+        .btn-nav {
+            font-family: var(--font-gothic);
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            padding: 8px 18px;
+            background: transparent;
+            color: var(--charcoal);
+            border: 1.5px solid var(--charcoal);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .btn-nav:hover { background: var(--charcoal); color: #fff; }
+
+        /* ── PAGE LAYOUT ── */
+        .page-wrapper {
+            max-width: 860px;
+            margin: 40px auto 0;
+            padding: 0 20px;
         }
 
-        .brand-icon i {
-            font-size: 2rem;
-            color: rgb(72, 68, 68);
-        }
-
-        .brand h1 {
+        .page-title {
+            font-family: var(--font-gothic);
             font-size: 1.6rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #1e293b, #2d3a5e);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
+            color: var(--charcoal);
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .page-subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            letter-spacing: 0.3px;
         }
 
-        .brand p {
-            color: #5b6e8c;
+        /* ── CARD ── */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 28px 30px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .card-title {
+            font-family: var(--font-gothic);
             font-size: 0.8rem;
-            margin-top: 4px;
-        }
-
-        .summary-box {
-            background: #f8fafc;
-            border-radius: 1.2rem;
-            padding: 1rem 1.2rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e2e8f0;
-        }
-
-        .summary-title {
             font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 0.8rem;
-            font-size: 0.9rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-label);
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 8px;
         }
+        .card-title i { color: var(--charcoal); font-size: 0.85rem; }
 
-        .summary-details {
+        /* ── BOOKING SUMMARY ── */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .summary-item .s-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+        }
+        .summary-item .s-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .summary-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 14px 0;
+        }
+        .summary-total {
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
-            gap: 0.5rem;
-            font-size: 0.85rem;
+            align-items: center;
+        }
+        .summary-total .t-label {
+            font-family: var(--font-gothic);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            color: var(--text-label);
+        }
+        .summary-total .t-amount {
+            font-family: var(--font-gothic);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--charcoal);
         }
 
-        .summary-item {
+        /* ── PAYMENT METHOD TABS ── */
+        .method-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .method-tab {
+            flex: 1;
+            padding: 12px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-surface);
+            cursor: pointer;
+            text-align: center;
+            transition: all var(--transition);
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .method-tab i {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            transition: color var(--transition);
+        }
+        .method-tab span {
+            font-size: 0.72rem;
+            font-family: var(--font-gothic);
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            transition: color var(--transition);
+        }
+        .method-tab:hover {
+            border-color: var(--charcoal);
+        }
+        .method-tab.active {
+            background: var(--charcoal);
+            border-color: var(--charcoal);
+        }
+        .method-tab.active i,
+        .method-tab.active span {
+            color: #fff;
         }
 
-        .summary-label {
-            color: #64748b;
-            font-size: 0.7rem;
-        }
-
-        .summary-value {
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .total-amount {
-            margin-top: 0.8rem;
-            padding-top: 0.7rem;
-            border-top: 1px dashed #cbd5e1;
+        /* ── FORM FIELDS ── */
+        .form-row {
             display: flex;
-            justify-content: space-between;
-            font-weight: 800;
-            color: #1e293b;
+            gap: 16px;
+            margin-bottom: 16px;
         }
-
-        .method-selector {
-            display: flex;
-            gap: 1rem;
-            margin: 1rem 0 1.2rem 0;
-            flex-wrap: wrap;
-        }
-
-        .method-option {
+        .form-group {
             flex: 1;
-            background: #f1f5f9;
-            border-radius: 1.2rem;
-            padding: 0.7rem;
-            text-align: center;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-
-        .method-option i {
-            font-size: 1.3rem;
-            display: block;
-            margin-bottom: 0.3rem;
+        .form-group label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--text-label);
         }
-
-        .method-option.selected {
-            background: white;
-            border-color: #4f46e5;
-            box-shadow: 0 4px 10px rgba(79,70,229,0.15);
-        }
-
-        /* Dynamic payment sections - each unique */
-        .payment-section {
-            display: none;
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #fefefe;
-            border-radius: 1.2rem;
-            border: 1px solid #e2e8f0;
-            transition: 0.2s;
-        }
-
-        .payment-section.active-section {
-            display: block;
-            animation: fadeSlide 0.25s ease;
-        }
-
-        @keyframes fadeSlide {
-            from { opacity: 0; transform: translateY(8px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
+        .input-wrap {
             position: relative;
         }
-
-        .input-group i.icon-left {
+        .input-wrap i.icon-left {
             position: absolute;
-            left: 1rem;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
-            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
             pointer-events: none;
         }
-
-        .input-group input, .input-group select {
+        .input-wrap input,
+        .input-wrap select {
             width: 100%;
-            padding: 0.7rem 1rem 0.7rem 2.4rem;
+            padding: 11px 12px 11px 34px;
+            background: var(--bg-surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
             font-size: 0.9rem;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 1.2rem;
-            background: white;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.2s;
+            color: var(--text-main);
             outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        .input-wrap input::placeholder { color: #aaa; }
+        .input-wrap input:focus,
+        .input-wrap select:focus {
+            border-color: var(--border-focus);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(58,58,58,0.08);
         }
 
-        .input-group input:focus, .input-group select:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        /* payment sections */
+        .payment-section { display: none; }
+        .payment-section.active { display: block; }
+
+        /* EFT bank info box */
+        .bank-info-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 0.82rem;
+            color: var(--text-label);
+            line-height: 1.9;
+        }
+        .bank-info-box strong { color: var(--charcoal); }
+
+        /* Cash info box */
+        .cash-info-box {
+            background: #fef9e3;
+            border: 1px solid #e8d98a;
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 0.82rem;
+            color: #5a4a00;
+            line-height: 1.8;
         }
 
-        .row-2cols {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .bank-details {
-            background: #f0f9ff;
-            padding: 0.8rem;
-            border-radius: 1rem;
-            margin: 0.5rem 0;
-            font-size: 0.8rem;
-        }
-
-        .bank-details p {
-            margin: 0.3rem 0;
-        }
-
-        .pay-btn {
-            background: linear-gradient(105deg, #4f46e5 0%, #6366f1 100%);
+        /* ── BUTTONS ── */
+        .btn-pay {
             width: 100%;
+            padding: 14px;
+            background: var(--charcoal);
+            color: #fff;
             border: none;
-            padding: 0.85rem;
-            border-radius: 2rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-gothic);
+            font-size: 0.85rem;
             font-weight: 700;
-            font-size: 1rem;
-            color: white;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.6rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            margin-top: 1rem;
+            gap: 8px;
+            margin-top: 6px;
         }
+        .btn-pay:hover { background: var(--charcoal-hover); }
+        .btn-pay:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .pay-btn:hover {
-            background: linear-gradient(105deg, #4338ca 0%, #4f46e5 100%);
-            transform: scale(0.98);
-        }
-
-        .message-area {
-            text-align: center;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-top: 1rem;
-            padding: 0.5rem;
-            border-radius: 2rem;
-        }
-
-        .error-msg {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .success-msg {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .info-note {
-            font-size: 0.7rem;
-            color: #6c86a3;
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        hr {
-            margin: 0.8rem 0;
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-gothic);
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            background: none;
             border: none;
-            border-top: 1px solid #e2e8f0;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: color var(--transition);
+            text-decoration: none;
+        }
+        .btn-back:hover { color: var(--charcoal); }
+
+        /* ── MESSAGE ── */
+        .message-box {
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 14px;
+            display: none;
+        }
+        .message-box.error {
+            display: block;
+            background: #fdecea;
+            color: #c0392b;
+            border: 1px solid #f5c6c2;
+        }
+        .message-box.success {
+            display: block;
+            background: #eaf7ed;
+            color: var(--green-ok);
+            border: 1px solid #b2dfbc;
+        }
+
+        /* ── SECURITY NOTE ── */
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 14px;
+        }
+
+        /* ── LOADING SPINNER ── */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 3000;
+            padding: 13px 20px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-gothic);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            color: #fff;
+            animation: toastIn 0.35s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .toast.success { background: var(--green-ok); }
+        .toast.error   { background: var(--red-accent); }
+        .toast.info    { background: var(--charcoal); }
+        @keyframes toastIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+
+        @media (max-width: 600px) {
+            .navbar { padding: 0 16px; }
+            .page-wrapper { padding: 0 12px; }
+            .card { padding: 20px 16px; }
+            .summary-grid { grid-template-columns: 1fr 1fr; }
+            .form-row { flex-direction: column; gap: 12px; }
+            .method-tabs { gap: 6px; }
         }
     </style>
 </head>
 <body>
-<div class="payment-container">
-    <div class="payment-card">
-        <div class="brand">
-            <div class="brand-icon">
-                <i class="fas fa-house-chimney"></i>
+
+<!-- NAV -->
+<nav class="navbar">
+    <a class="nav-logo" href="index.html">🏰 HOTEL TRANSYLVANIA</a>
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="booking.html">Book Now</a></li>
+        <li><a href="mybookings.html">My Bookings</a></li>
+    </ul>
+    <button class="btn-nav" id="userStatusBtn" onclick="handleAuthAction()">SIGN IN</button>
+</nav>
+
+<div class="page-wrapper">
+
+    <a class="btn-back" href="booking.html">
+        <i class="fas fa-arrow-left"></i> Back to Booking
+    </a>
+
+    <h2 class="page-title">Complete Your Payment</h2>
+    <p class="page-subtitle">Secure checkout · Hotel Transylvania</p>
+
+    <!-- BOOKING SUMMARY CARD -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-receipt"></i> Booking Summary</div>
+        <div class="summary-grid" id="summaryGrid">
+            <div class="summary-item">
+                <div class="s-label">Booking ID</div>
+                <div class="s-value" id="sumBookingId">—</div>
             </div>
-            <h1>Complete Your Payment</h1>
-            <p>Secure checkout • Hotel Transylvania</p>
+            <div class="summary-item">
+                <div class="s-label">Room</div>
+                <div class="s-value" id="sumRoom">—</div>
+            </div>
+            <div class="summary-item">
+                <div class="s-label">Guests</div>
+                <div class="s-value" id="sumGuests">—</div>
+            </div>
+            <div class="summary-item">
+                <div class="s-label">Check-in</div>
+                <div class="s-value" id="sumCheckIn">—</div>
+            </div>
+            <div class="summary-item">
+                <div class="s-label">Check-out</div>
+                <div class="s-value" id="sumCheckOut">—</div>
+            </div>
+            <div class="summary-item">
+                <div class="s-label">Nights</div>
+                <div class="s-value" id="sumNights">—</div>
+            </div>
         </div>
-
-        <!-- Reservation Summary -->
-        <div class="summary-box" id="summaryBox"></div>
-
-        <!-- Payment Method Selector -->
-        <div class="summary-title"><i class="fas fa-wallet"></i> Select Payment Method</div>
-        <div class="method-selector" id="methodSelector">
-            <div class="method-option" data-method="credit_debit">
-                <i class="fab fa-cc-visa"></i> <span>Card (Credit/Debit)</span>
-            </div>
-            <div class="method-option" data-method="eft">
-                <i class="fas fa-university"></i> <span>EFT / Bank Transfer</span>
-            </div>
-            <div class="method-option" data-method="cash">
-                <i class="fas fa-money-bill-wave"></i> <span>Cash (at hotel)</span>
-            </div>
-        </div>
-
-        <!-- ========== UNIQUE PAYMENT SECTIONS ========== -->
-        <!-- 1) Credit/Debit Card Section (traditional card form) -->
-        <div id="creditDebitSection" class="payment-section">
-            <div class="input-group">
-                <i class="fas fa-user icon-left"></i>
-                <input type="text" id="cardholderName" placeholder="Cardholder full name" autocomplete="cc-name">
-            </div>
-            <div class="input-group">
-                <i class="fas fa-credit-card icon-left"></i>
-                <input type="text" id="cardNumber" placeholder="Card number (16 digits)" maxlength="19" autocomplete="cc-number">
-            </div>
-            <div class="row-2cols">
-                <div class="input-group">
-                    <i class="fas fa-calendar-alt icon-left"></i>
-                    <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
-                </div>
-                <div class="input-group">
-                    <i class="fas fa-lock icon-left"></i>
-                    <input type="text" id="cvv" placeholder="CVV" maxlength="4">
-                </div>
-            </div>
-            <button type="button" class="pay-btn" id="payCardBtn"><i class="fas fa-lock"></i> Pay with Card</button>
-        </div>
-
-        <!-- 2) EFT / Bank Transfer Section (unique: shows bank details + proof upload reference) -->
-        <div id="eftSection" class="payment-section">
-            <div class="bank-details">
-                <p><i class="fas fa-building"></i> <strong>Hotel Transylvania – Official Bank Account</strong></p>
-                <p><i class="fas fa-university"></i> Bank: First National Bank (FNB)</p>
-                <p><i class="fas fa-user"></i> Account Holder: Hotel Transylvania (Pty) Ltd</p>
-                <p><i class="fas fa-credit-card"></i> Account Number: 6284 950 1234</p>
-                <p><i class="fas fa-code-branch"></i> Branch Code: 250655</p>
-                <p><i class="fas fa-globe"></i> Reference: Use your <strong>Booking ID</strong> (B1007)</p>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-user-check icon-left"></i>
-                <input type="text" id="eftAccountHolder" placeholder="Account holder name (as per bank)">
-            </div>
-            <div class="input-group">
-                <i class="fas fa-hashtag icon-left"></i>
-                <input type="text" id="eftReference" placeholder="Your unique reference / Booking ID" value="B1007">
-            </div>
-            <div class="input-group">
-                <i class="fas fa-calendar-week icon-left"></i>
-                <input type="date" id="eftTransferDate" placeholder="Transfer date">
-            </div>
-            <button type="button" class="pay-btn" id="payEftBtn"><i class="fas fa-upload"></i> Confirm EFT Payment</button>
-        </div>
-
-        <!-- 3) Cash at Hotel Section (unique: reservation hold, pay on arrival) -->
-        <div id="cashSection" class="payment-section">
-            <div style="background:#fef9e3; border-radius:1rem; padding:0.9rem; margin-bottom:1rem;">
-                <p><i class="fas fa-hotel"></i> <strong>Pay upon arrival</strong></p>
-                <p style="font-size:0.8rem; margin-top:5px;">You can settle the total amount in cash at the hotel reception during check-in. Your room will be held for you. Please present your Booking ID.</p>
-            </div>
-            <div class="input-group">
-                <i class="fas fa-user icon-left"></i>
-                <input type="text" id="cashGuestName" placeholder="Full name (for check-in reference)">
-            </div>
-            <div class="input-group">
-                <i class="fas fa-phone icon-left"></i>
-                <input type="tel" id="cashPhone" placeholder="Contact number">
-            </div>
-            <button type="button" class="pay-btn" id="payCashBtn"><i class="fas fa-check-circle"></i> Confirm Cash Reservation</button>
-        </div>
-
-        <div id="paymentMessage" class="message-area"></div>
-        <div class="info-note">
-            <i class="fas fa-shield-alt"></i> Payment secures your booking. After confirmation, status becomes "Confirmed".
+        <div class="summary-divider"></div>
+        <div class="summary-total">
+            <span class="t-label">Total Amount Due</span>
+            <span class="t-amount" id="sumTotal">R —</span>
         </div>
     </div>
+
+    <!-- PAYMENT CARD -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-wallet"></i> Select Payment Method</div>
+
+        <!-- METHOD TABS -->
+        <div class="method-tabs">
+            <div class="method-tab active" data-method="card" onclick="switchMethod('card')">
+                <i class="fab fa-cc-visa"></i>
+                <span>Card</span>
+            </div>
+            <div class="method-tab" data-method="eft" onclick="switchMethod('eft')">
+                <i class="fas fa-university"></i>
+                <span>EFT</span>
+            </div>
+            <div class="method-tab" data-method="cash" onclick="switchMethod('cash')">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Cash</span>
+            </div>
+        </div>
+
+        <!-- CARD SECTION -->
+        <div class="payment-section active" id="section-card">
+            <div class="form-row">
+                <div class="form-group" style="flex:2">
+                    <label>Cardholder Name</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon-left"></i>
+                        <input type="text" id="cardName" placeholder="Full name on card" autocomplete="cc-name">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex:2">
+                    <label>Card Number</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-credit-card icon-left"></i>
+                        <input type="text" id="cardNumber" placeholder="1234  5678  9012  3456" maxlength="19" autocomplete="cc-number">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Expiry Date</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-calendar-alt icon-left"></i>
+                        <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>CVV</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock icon-left"></i>
+                        <input type="text" id="cardCvv" placeholder="123" maxlength="4">
+                    </div>
+                </div>
+            </div>
+            <button class="btn-pay" id="btnPayCard" onclick="handleCardPayment()">
+                <i class="fas fa-lock"></i> Pay with Card
+            </button>
+        </div>
+
+        <!-- EFT SECTION -->
+        <div class="payment-section" id="section-eft">
+            <div class="bank-info-box">
+                <strong>Hotel Transylvania – Bank Details</strong><br>
+                Bank: First National Bank (FNB)<br>
+                Account Holder: Hotel Transylvania (Pty) Ltd<br>
+                Account Number: 6284 950 1234<br>
+                Branch Code: 250655<br>
+                Reference: Use your <strong>Booking ID</strong>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Account Holder Name</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon-left"></i>
+                        <input type="text" id="eftName" placeholder="Name as per your bank account">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Your Booking Reference</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-hashtag icon-left"></i>
+                        <input type="text" id="eftRef" placeholder="e.g. RES-001">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Transfer Date</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-calendar icon-left"></i>
+                        <input type="date" id="eftDate">
+                    </div>
+                </div>
+            </div>
+            <button class="btn-pay" id="btnPayEft" onclick="handleEftPayment()">
+                <i class="fas fa-upload"></i> Confirm EFT Payment
+            </button>
+        </div>
+
+        <!-- CASH SECTION -->
+        <div class="payment-section" id="section-cash">
+            <div class="cash-info-box">
+                <strong>Pay upon arrival at the hotel.</strong><br>
+                Your room will be held for you. Please present your Booking ID at reception during check-in. Cash payment must be settled before you are given the room key.
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user icon-left"></i>
+                        <input type="text" id="cashName" placeholder="For check-in reference">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-phone icon-left"></i>
+                        <input type="tel" id="cashPhone" placeholder="+27 ...">
+                    </div>
+                </div>
+            </div>
+            <button class="btn-pay" id="btnPayCash" onclick="handleCashPayment()">
+                <i class="fas fa-check-circle"></i> Confirm Cash Reservation
+            </button>
+        </div>
+
+        <div class="message-box" id="payMessage"></div>
+
+        <div class="security-note">
+            <i class="fas fa-shield-alt"></i>
+            Payment confirmation changes reservation status to Confirmed
+        </div>
+    </div>
+
 </div>
 
+<div id="toastContainer"></div>
+
 <script>
-    // Reservation data (same as previous based on Phase 2)
-    let currentReservation = {
-        bookingId: "B1007",
-        guestName: "Guest User",
-        roomNumber: "004",
-        roomType: "Family Room",
-        checkIn: "2026-06-10",
-        checkOut: "2026-06-15",
-        nights: 5,
-        pricePerNight: 2200,
-        totalCost: 11000,
-        guestEmail: "guest@example.com",
-        status: "Pending"
-    };
+    // ── Auth helpers ──
+    let authToken = localStorage.getItem('authToken') || null;
+    let userData = null;
+    try { userData = JSON.parse(localStorage.getItem('userData')); } catch(e) {}
 
-    let selectedMethod = "credit_debit";   // track active method
-
-    function formatZAR(amount) {
-        return "R " + amount.toLocaleString();
+    function updateAuthUI() {
+        const btn = document.getElementById('userStatusBtn');
+        if (authToken && userData) {
+            const name = userData.name || userData.first_name || 'Guest';
+            btn.textContent = `👤 ${name.split(' ')[0]}`;
+        } else {
+            btn.textContent = 'SIGN IN';
+        }
     }
-
-    function renderSummary() {
-        document.getElementById('summaryBox').innerHTML = `
-            <div class="summary-title"><i class="fas fa-receipt"></i> Booking Summary</div>
-            <div class="summary-details">
-                <div class="summary-item"><span class="summary-label">Booking ID</span><span class="summary-value">${currentReservation.bookingId}</span></div>
-                <div class="summary-item"><span class="summary-label">Room</span><span class="summary-value">${currentReservation.roomNumber} · ${currentReservation.roomType}</span></div>
-                <div class="summary-item"><span class="summary-label">Check-in</span><span class="summary-value">${currentReservation.checkIn}</span></div>
-                <div class="summary-item"><span class="summary-label">Check-out</span><span class="summary-value">${currentReservation.checkOut}</span></div>
-                <div class="summary-item"><span class="summary-label">Nights</span><span class="summary-value">${currentReservation.nights}</span></div>
-                <div class="summary-item"><span class="summary-label">Rate/night</span><span class="summary-value">${formatZAR(currentReservation.pricePerNight)}</span></div>
-            </div>
-            <div class="total-amount"><span>Total Amount Due:</span><span style="font-size:1.2rem;">${formatZAR(currentReservation.totalCost)}</span></div>
-        `;
-    }
-
-    function showMessage(msg, isError) {
-        const msgDiv = document.getElementById('paymentMessage');
-        msgDiv.innerHTML = msg;
-        msgDiv.className = `message-area ${isError ? 'error-msg' : 'success-msg'}`;
-        if (!isError) {
-            setTimeout(() => {
-                if (msgDiv.innerHTML === msg) msgDiv.innerHTML = '';
-            }, 4500);
+    function handleAuthAction() {
+        if (authToken) {
+            if (confirm('Do you want to log out?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userData');
+                window.location.href = 'index.html';
+            }
+        } else {
+            window.location.href = 'index.html';
         }
     }
 
-    // disable all inputs after success
-    function disableAllSections() {
-        document.querySelectorAll('#creditDebitSection input, #eftSection input, #cashSection input').forEach(inp => inp.disabled = true);
-        document.querySelectorAll('.method-option').forEach(opt => opt.style.pointerEvents = 'none');
-        const btns = ['payCardBtn', 'payEftBtn', 'payCashBtn'];
-        btns.forEach(id => {
-            let btn = document.getElementById(id);
-            if(btn) btn.disabled = true;
+    // ── Toast ──
+    function showToast(msg, type = 'info') {
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.textContent = msg;
+        document.getElementById('toastContainer').appendChild(t);
+        setTimeout(() => t.remove(), 3200);
+    }
+
+    // ── Reservation data (loaded from sessionStorage or URL params, fallback to demo) ──
+    let reservation = {};
+
+    function loadReservation() {
+        try {
+            const stored = sessionStorage.getItem('pendingReservation');
+            if (stored) { reservation = JSON.parse(stored); }
+        } catch(e) {}
+        // Demo fallback
+        if (!reservation.bookingId) {
+            reservation = {
+                bookingId:    'RES-DEMO-001',
+                guestName:    (userData?.name || userData?.first_name || 'Guest'),
+                roomNumber:   '004',
+                roomType:     'Family Room',
+                checkIn:      '2026-06-10',
+                checkOut:     '2026-06-15',
+                nights:       5,
+                pricePerNight: 1200,
+                totalCost:    6000,
+                numGuests:    2
+            };
+        }
+
+        // Populate summary
+        document.getElementById('sumBookingId').textContent  = reservation.bookingId;
+        document.getElementById('sumRoom').textContent       = `${reservation.roomNumber} · ${reservation.roomType}`;
+        document.getElementById('sumGuests').textContent     = reservation.numGuests ?? '—';
+        document.getElementById('sumCheckIn').textContent    = formatDateZA(reservation.checkIn);
+        document.getElementById('sumCheckOut').textContent   = formatDateZA(reservation.checkOut);
+        document.getElementById('sumNights').textContent     = reservation.nights ?? '—';
+        document.getElementById('sumTotal').textContent      = `R ${Number(reservation.totalCost).toLocaleString()}`;
+
+        // Pre-fill EFT reference
+        document.getElementById('eftRef').value = reservation.bookingId;
+
+        // Pre-fill names if userData present
+        if (userData) {
+            const fullName = userData.name || `${userData.first_name || ''} ${userData.last_name || ''}`.trim();
+            if (document.getElementById('cardName') && !document.getElementById('cardName').value)
+                document.getElementById('cardName').value = fullName;
+            if (document.getElementById('cashName') && !document.getElementById('cashName').value)
+                document.getElementById('cashName').value = fullName;
+            if (document.getElementById('cashPhone') && !document.getElementById('cashPhone').value)
+                document.getElementById('cashPhone').value = userData.phone || '';
+        }
+    }
+
+    function formatDateZA(iso) {
+        if (!iso) return '—';
+        const [y,m,d] = iso.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    // ── Method switching ──
+    let activeMethod = 'card';
+    function switchMethod(method) {
+        activeMethod = method;
+        document.querySelectorAll('.method-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.method === method);
         });
+        document.querySelectorAll('.payment-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(`section-${method}`).classList.add('active');
+        clearMessage();
     }
 
-    // Generic payment success (updates booking status, shows invoice)
-    function finalizePayment(methodName, extraInfo = '') {
-        if (currentReservation.status === 'Confirmed') {
-            showMessage(`Booking already confirmed.`, false);
-            return;
-        }
-        currentReservation.status = "Confirmed";
-        const invoiceNo = "INV-" + Date.now();
-        showMessage(`✅ ${methodName} successful! Booking ${currentReservation.bookingId} CONFIRMED. Invoice: ${invoiceNo}. ${extraInfo}`, false);
-        disableAllSections();
+    // ── Message helpers ──
+    function showMessage(msg, type) {
+        const box = document.getElementById('payMessage');
+        box.textContent = msg;
+        box.className = `message-box ${type}`;
+    }
+    function clearMessage() {
+        const box = document.getElementById('payMessage');
+        box.className = 'message-box';
+        box.textContent = '';
     }
 
-    // ----- CREDIT/DEBIT CARD validation (unique flow)-----
+    // ── Card number & expiry formatting ──
+    document.addEventListener('DOMContentLoaded', () => {
+        const cardNum = document.getElementById('cardNumber');
+        if (cardNum) cardNum.addEventListener('input', e => {
+            let v = e.target.value.replace(/\D/g,'').substring(0,16);
+            e.target.value = v.replace(/(.{4})/g,'$1 ').trim();
+        });
+        const expiry = document.getElementById('cardExpiry');
+        if (expiry) expiry.addEventListener('input', e => {
+            let v = e.target.value.replace(/\D/g,'');
+            if (v.length >= 2) v = v.slice(0,2) + '/' + v.slice(2,4);
+            e.target.value = v;
+        });
+    });
+
+    // ── Validation ──
     function validateCard() {
-        const name = document.getElementById('cardholderName').value.trim();
-        const cardRaw = document.getElementById('cardNumber').value.replace(/\s/g, '');
-        const expiry = document.getElementById('expiry').value;
-        const cvv = document.getElementById('cvv').value;
-        if (!name || name.length < 3) return "Enter valid cardholder name.";
-        if (!/^\d{13,19}$/.test(cardRaw)) return "Card number must be 13-19 digits.";
-        if (!/^\d{2}\/\d{2}$/.test(expiry)) return "Expiry format MM/YY.";
-        const [month, year] = expiry.split('/');
-        const currentYear = new Date().getFullYear() % 100;
-        const currentMonth = new Date().getMonth() + 1;
-        if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth))
-            return "Card expired.";
-        if (!/^\d{3,4}$/.test(cvv)) return "Invalid CVV.";
+        const name  = document.getElementById('cardName').value.trim();
+        const num   = document.getElementById('cardNumber').value.replace(/\s/g,'');
+        const exp   = document.getElementById('cardExpiry').value;
+        const cvv   = document.getElementById('cardCvv').value;
+        if (!name || name.length < 3)       return 'Please enter the cardholder name.';
+        if (!/^\d{13,19}$/.test(num))       return 'Card number must be 13–19 digits.';
+        if (!/^\d{2}\/\d{2}$/.test(exp))    return 'Expiry must be MM/YY.';
+        const [m, y] = exp.split('/');
+        const now = new Date();
+        const expDate = new Date(2000 + parseInt(y), parseInt(m) - 1);
+        if (expDate < now)                   return 'This card has expired.';
+        if (!/^\d{3,4}$/.test(cvv))         return 'CVV must be 3 or 4 digits.';
         return null;
     }
 
-    function handleCardPayment() {
-        const error = validateCard();
-        if (error) { showMessage(error, true); return; }
-        finalizePayment("Card Payment", "Your card has been charged securely.");
-    }
-
-    // ----- EFT unique: check reference & date -----
-    function handleEftPayment() {
-        const accountHolder = document.getElementById('eftAccountHolder').value.trim();
-        const reference = document.getElementById('eftReference').value.trim();
-        const transferDate = document.getElementById('eftTransferDate').value;
-        if (!accountHolder) { showMessage("Please enter the bank account holder name.", true); return; }
-        if (!reference) { showMessage("Please enter your booking reference (Booking ID).", true); return; }
-        if (!transferDate) { showMessage("Please select the transfer date.", true); return; }
-        // optional: match reference to current booking id
-        if (!reference.includes(currentReservation.bookingId) && reference !== currentReservation.bookingId) {
-            showMessage(`Reference must match your Booking ID (${currentReservation.bookingId}) for verification.`, true);
+    // ── Finalize payment ──
+    async function finalizePayment(method, extraNote = '') {
+        if (reservation.confirmed) {
+            showMessage('This booking is already confirmed.', 'success');
             return;
         }
-        finalizePayment("EFT Bank Transfer", "Our team will verify the transfer within 24h. Your room is tentatively reserved.");
-    }
 
-    // ----- Cash at hotel: unique (pay on arrival, no card details) -----
-    function handleCashPayment() {
-        const fullName = document.getElementById('cashGuestName').value.trim();
-        const phone = document.getElementById('cashPhone').value.trim();
-        if (!fullName) { showMessage("Please enter your full name for check-in reference.", true); return; }
-        if (!phone || phone.length < 8) { showMessage("Please provide a valid contact number.", true); return; }
-        finalizePayment("Cash on Arrival", "You will pay at reception. Your room is now reserved.");
-    }
+        const invoiceNo = 'INV-' + Date.now();
 
-    // ----- SWITCH BETWEEN PAYMENT SECTIONS (unique UI swapping) -----
-    function switchPaymentMethod(methodId) {
-        selectedMethod = methodId;
-        // hide all sections
-        document.getElementById('creditDebitSection').classList.remove('active-section');
-        document.getElementById('eftSection').classList.remove('active-section');
-        document.getElementById('cashSection').classList.remove('active-section');
-        if (methodId === 'credit_debit') {
-            document.getElementById('creditDebitSection').classList.add('active-section');
-        } else if (methodId === 'eft') {
-            document.getElementById('eftSection').classList.add('active-section');
-            // prefill reference with booking id for consistency
-            document.getElementById('eftReference').value = currentReservation.bookingId;
-        } else if (methodId === 'cash') {
-            document.getElementById('cashSection').classList.add('active-section');
-        }
-        // clear any old message when switching
-        document.getElementById('paymentMessage').innerHTML = '';
-        document.getElementById('paymentMessage').className = 'message-area';
-    }
-
-    // Initialize method selector and UI events
-    function initMethods() {
-        const options = document.querySelectorAll('.method-option');
-        options.forEach(opt => {
-            opt.addEventListener('click', () => {
-                options.forEach(o => o.classList.remove('selected'));
-                opt.classList.add('selected');
-                const methodVal = opt.getAttribute('data-method');
-                switchPaymentMethod(methodVal);
+        // Try to POST to backend
+        try {
+            const resp = await fetch('/payments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                body: JSON.stringify({
+                    payment_id: invoiceNo,
+                    reservation_id: reservation.bookingId,
+                    amount: reservation.totalCost,
+                    payment_method: method,
+                    payment_date: new Date().toISOString().split('T')[0],
+                    payment_status: 'Paid'
+                })
             });
-        });
-        // default: credit/debit active
-        document.querySelector('.method-option[data-method="credit_debit"]').classList.add('selected');
-        switchPaymentMethod('credit_debit');
+            if (!resp.ok) throw new Error();
+            // Also update reservation status
+            await fetch(`/reservation/${reservation.bookingId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                body: JSON.stringify({ payment_status: 'Confirmed' })
+            });
+        } catch(e) {
+            // Demo mode — continue
+        }
+
+        reservation.confirmed = true;
+        showMessage(`✓ Payment confirmed! Booking ${reservation.bookingId} is now CONFIRMED. Invoice: ${invoiceNo}. ${extraNote}`, 'success');
+        // Disable all inputs
+        document.querySelectorAll('.payment-section input').forEach(i => i.disabled = true);
+        document.querySelectorAll('.btn-pay').forEach(b => b.disabled = true);
+        document.querySelectorAll('.method-tab').forEach(t => t.style.pointerEvents = 'none');
+        showToast('Booking confirmed!', 'success');
+
+        // Save to local demo bookings if applicable
+        try {
+            let demo = JSON.parse(localStorage.getItem('demoBookings') || '[]');
+            demo = demo.map(b => b.id === reservation.bookingId ? { ...b, status: 'Confirmed' } : b);
+            localStorage.setItem('demoBookings', JSON.stringify(demo));
+        } catch(e) {}
     }
 
-    // attach button listeners
-    function attachButtonListeners() {
-        document.getElementById('payCardBtn').addEventListener('click', handleCardPayment);
-        document.getElementById('payEftBtn').addEventListener('click', handleEftPayment);
-        document.getElementById('payCashBtn').addEventListener('click', handleCashPayment);
+    // ── Card payment ──
+    function handleCardPayment() {
+        clearMessage();
+        const err = validateCard();
+        if (err) { showMessage(err, 'error'); return; }
+        finalizePayment('Card', 'Your card has been charged.');
     }
 
-    // card number formatting only for credit section
-    function formatCardNumber(value) {
-        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-        const parts = [];
-        for (let i = 0; i < v.length && i < 16; i += 4) parts.push(v.substring(i, i+4));
-        return parts.join(' ');
-    }
-    function handleCardNumberInput(e) {
-        let input = e.target;
-        let formatted = formatCardNumber(input.value);
-        input.value = formatted;
-    }
-    function handleExpiryInput(e) {
-        let val = e.target.value.replace(/\D/g, '');
-        if (val.length >= 2) val = val.slice(0,2) + '/' + val.slice(2,4);
-        e.target.value = val;
+    // ── EFT payment ──
+    function handleEftPayment() {
+        clearMessage();
+        const name = document.getElementById('eftName').value.trim();
+        const ref  = document.getElementById('eftRef').value.trim();
+        const date = document.getElementById('eftDate').value;
+        if (!name) { showMessage('Please enter the account holder name.', 'error'); return; }
+        if (!ref)  { showMessage('Please enter your booking reference.', 'error'); return; }
+        if (!date) { showMessage('Please select the transfer date.', 'error'); return; }
+        if (!ref.includes(reservation.bookingId)) {
+            showMessage(`Reference must contain your Booking ID (${reservation.bookingId}).`, 'error');
+            return;
+        }
+        finalizePayment('EFT', 'Our team will verify within 24 hours. Room is tentatively reserved.');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        renderSummary();
-        initMethods();
-        attachButtonListeners();
-        const cardNum = document.getElementById('cardNumber');
-        if(cardNum) cardNum.addEventListener('input', handleCardNumberInput);
-        const expiryField = document.getElementById('expiry');
-        if(expiryField) expiryField.addEventListener('input', handleExpiryInput);
-    });
+    // ── Cash payment ──
+    function handleCashPayment() {
+        clearMessage();
+        const name  = document.getElementById('cashName').value.trim();
+        const phone = document.getElementById('cashPhone').value.trim();
+        if (!name)                  { showMessage('Please enter your full name.', 'error'); return; }
+        if (!phone || phone.length < 8) { showMessage('Please enter a valid contact number.', 'error'); return; }
+        finalizePayment('Cash', 'Please pay at reception upon check-in.');
+    }
+
+    // ── Init ──
+    updateAuthUI();
+    loadReservation();
 </script>
 </body>
 </html>
