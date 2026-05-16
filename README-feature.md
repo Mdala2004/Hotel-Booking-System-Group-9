@@ -18,7 +18,7 @@ npm install
 
 ### 3. Configure the Oracle Connection
 
-Copy `.env.example` to `.env` and fill in your credentials  
+Copy `.env.example` to `.env` and fill in the credentials  
 (ask the team for the credentials).
 
 ```env
@@ -41,6 +41,6 @@ npm run dev
 ```
 
 Server starts at: `http://localhost:3000`  
-Frontend dashboard: `http://localhost:3000`
+
 
 
