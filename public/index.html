@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand Horizon — Hotel Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208; --cream: #f5f0e8; --gold: #c9a84c; --gold-light: #e8d49a;
+    --sand: #e8dfc8; --rust: #8b3a2a; --rust-light: #c05a44; --forest: #2d4a3e;
+    --mist: #f9f6f0; --border: rgba(201,168,76,0.25); --shadow: 0 4px 24px rgba(26,18,8,0.10);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--ink); min-height:100vh; font-size:14px; }
+  .shell { display:flex; min-height:100vh; }
+  .sidebar { width:240px; min-height:100vh; background:var(--ink); display:flex; flex-direction:column; position:fixed; top:0; left:0; z-index:100; }
+  .sidebar-logo { padding:32px 24px 20px; border-bottom:1px solid rgba(201,168,76,0.2); }
+  .sidebar-logo .brand { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--gold); letter-spacing:0.5px; line-height:1.2; }
+  .sidebar-logo .tagline { font-size:10px; color:rgba(255,255,255,0.35); letter-spacing:2px; text-transform:uppercase; margin-top:4px; }
+  .nav { padding:20px 0; flex:1; }
+  .nav-item { display:flex; align-items:center; gap:12px; padding:11px 24px; cursor:pointer; color:rgba(255,255,255,0.5); transition:all 0.2s; font-size:13px; border-left:3px solid transparent; }
+  .nav-item:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.04); }
+  .nav-item.active { color:var(--gold); border-left-color:var(--gold); background:rgba(201,168,76,0.08); }
+  .nav-item .icon { font-size:16px; width:20px; text-align:center; }
+  .sidebar-footer { padding:16px 24px; border-top:1px solid rgba(201,168,76,0.15); font-size:11px; color:rgba(255,255,255,0.25); }
+  .main { margin-left:240px; flex:1; display:flex; flex-direction:column; }
+  .topbar { background:var(--mist); border-bottom:1px solid var(--border); padding:16px 36px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; }
+  .page-title { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:600; color:var(--ink); }
+  .btn { padding:9px 20px; border-radius:4px; font-size:12px; font-weight:500; cursor:pointer; border:none; transition:all 0.18s; font-family:'DM Sans',sans-serif; letter-spacing:0.3px; }
+  .btn-primary { background:var(--gold); color:var(--ink); }
+  .btn-primary:hover { background:#b8943d; }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--ink); }
+  .btn-ghost:hover { background:var(--sand); }
+  .btn-danger { background:var(--rust); color:#fff; }
+  .btn-danger:hover { background:var(--rust-light); }
+  .btn-success { background:var(--forest); color:#fff; }
+  .btn-success:hover { background:#3d6654; }
+  .btn-sm { padding:5px 12px; font-size:11px; }
+  .content { padding:32px 36px; flex:1; }
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:32px; }
+  .stat-card { background:white; border:1px solid var(--border); border-radius:8px; padding:22px 24px; position:relative; overflow:hidden; }
+  .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold); }
+  .stat-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#888; }
+  .stat-value { font-family:'Cormorant Garamond',serif; font-size:38px; font-weight:600; color:var(--ink); line-height:1.1; margin-top:6px; }
+  .stat-sub { font-size:11px; color:var(--forest); margin-top:4px; }
+  .panel { background:white; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:24px; }
+  .panel-header { padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .panel-title { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; }
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; padding:11px 20px; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:#888; background:var(--mist); border-bottom:1px solid var(--border); font-weight:500; }
+  td { padding:13px 20px; border-bottom:1px solid #f0ebe0; font-size:13px; vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fdfaf4; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:500; letter-spacing:0.3px; text-transform:uppercase; }
+  .badge-available { background:#e8f5ec; color:#2d7a44; }
+  .badge-occupied   { background:#fdecea; color:var(--rust); }
+  .badge-confirmed  { background:#e8f5ec; color:#2d7a44; }
+  .badge-pending    { background:#fff8e6; color:#a07000; }
+  .badge-cancelled  { background:#f5e8e8; color:#8b2020; }
+  .badge-paid       { background:#e8f5ec; color:#2d7a44; }
+  .badge-refunded   { background:#e8eef5; color:#1a4a7a; }
+  .view { display:none; }
+  .view.active { display:block; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-group.full { grid-column:1 / -1; }
+  label { font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#777; font-weight:500; }
+  input, select { padding:10px 14px; border:1px solid #ddd; border-radius:4px; font-family:'DM Sans',sans-serif; font-size:13px; background:white; transition:border 0.15s; outline:none; }
+  input:focus, select:focus { border-color:var(--gold); }
+  .form-actions { margin-top:20px; display:flex; gap:10px; }
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,18,8,0.55); z-index:200; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:white; border-radius:10px; width:540px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 24px 80px rgba(26,18,8,0.2); }
+  .modal-header { padding:22px 28px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .modal-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; }
+  .modal-close { cursor:pointer; font-size:20px; color:#999; background:none; border:none; line-height:1; }
+  .modal-body { padding:24px 28px 28px; }
+  .alert { padding:12px 16px; border-radius:4px; font-size:13px; margin-bottom:16px; display:none; }
+  .alert.show { display:block; }
+  .alert-success { background:#e8f5ec; color:#2d7a44; border-left:3px solid #2d7a44; }
+  .alert-error   { background:#fdecea; color:var(--rust); border-left:3px solid var(--rust); }
+  .search-bar { display:flex; gap:10px; margin-bottom:20px; align-items:center; }
+  .search-bar input { flex:1; max-width:300px; }
+  .empty { text-align:center; padding:48px; color:#aaa; font-family:'Cormorant Garamond',serif; font-size:18px; font-style:italic; }
+  .loading { text-align:center; padding:32px; color:#aaa; font-size:13px; }
+  .info-box { background:#fff8e6; border:1px solid #e8c84c; border-radius:6px; padding:12px 16px; font-size:12px; color:#7a5500; margin-bottom:16px; line-height:1.5; }
+  #login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; background:var(--ink); }
+  .login-box { background:white; border-radius:10px; padding:48px 44px; width:400px; box-shadow:0 32px 80px rgba(0,0,0,0.4); }
+  .login-logo { font-family:'Cormorant Garamond',serif; font-size:30px; color:var(--gold); margin-bottom:4px; }
+  .login-sub { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:#aaa; margin-bottom:32px; }
+  .login-box .form-group { margin-bottom:16px; }
+  .login-box input { width:100%; }
+  .login-box .btn { width:100%; margin-top:8px; padding:12px; font-size:13px; }
+  .cost-preview { background:var(--mist); border:1px solid var(--border); border-radius:6px; padding:14px 16px; font-size:13px; margin-top:8px; display:none; }
+  .cost-preview.show { display:block; }
+  .tabs { display:flex; gap:2px; border-bottom:1px solid var(--border); margin-bottom:20px; }
+  .tab { padding:10px 20px; cursor:pointer; font-size:13px; color:#888; border-bottom:2px solid transparent; transition:all 0.15s; }
+  .tab.active { color:var(--ink); border-bottom-color:var(--gold); font-weight:500; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+  /* Access denied panel */
+  .access-denied { text-align:center; padding:64px 32px; }
+  .access-denied .icon { font-size:48px; margin-bottom:16px; opacity:0.3; }
+  .access-denied h3 { font-family:'Cormorant Garamond',serif; font-size:22px; color:#888; margin-bottom:8px; }
+  .access-denied p { font-size:13px; color:#aaa; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Grand Horizon</div>
+    <div class="login-sub">Hotel Management System</div>
+    <div id="login-alert" class="alert"></div>
+    <div class="form-group"><label>Username</label><input type="text" id="login-username" placeholder="Enter username" /></div>
+    <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="Enter password" /></div>
+    <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
+    <p style="text-align:center;margin-top:16px;font-size:12px;color:#aaa">
+      No account? <span style="color:var(--gold);cursor:pointer" onclick="showRegister()">Register here</span>
+    </p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="brand">Grand Horizon</div>
+        <div class="tagline">Management Portal</div>
+      </div>
+      <nav class="nav" id="main-nav">
+        
+      </nav>
+      <div class="sidebar-footer">
+        <span id="sidebar-role" style="color:var(--gold-light);display:block;margin-bottom:2px"></span>
+        Logged in as <span id="sidebar-user" style="color:var(--gold-light)"></span><br>
+        <span style="cursor:pointer;text-decoration:underline" onclick="logout()">Sign out</span>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="page-title" id="page-title">Dashboard</div>
+        <div style="font-size:12px;color:#888" id="topbar-date"></div>
+      </div>
+      <div class="content">
+
+        <!-- DASHBOARD -->
+        <div id="view-dashboard" class="view active">
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Rooms</div><div class="stat-value" id="stat-rooms">–</div><div class="stat-sub">Max 10 rooms</div></div>
+            <div class="stat-card"><div class="stat-label">Available</div><div class="stat-value" id="stat-available">–</div><div class="stat-sub">Ready to book</div></div>
+            <div class="stat-card"><div class="stat-label">Reservations</div><div class="stat-value" id="stat-reservations">–</div><div class="stat-sub">All time</div></div>
+            <div class="stat-card"><div class="stat-label">Guests</div><div class="stat-value" id="stat-guests">–</div><div class="stat-sub">Registered</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">My Recent Bookings</div><button class="btn btn-ghost btn-sm" onclick="showView('my-bookings')">View all</button></div>
+            <div id="dashboard-reservations"><div class="loading">Loading...</div></div>
+          </div>
+        </div>
+
+        <!-- ROOMS -->
+        <div id="view-rooms" class="view">
+          <div class="search-bar">
+            <input type="text" id="room-search" placeholder="Search rooms..." oninput="filterRooms()">
+            <select id="room-status-filter" onchange="filterRooms()">
+              <option value="">All Statuses</option>
+              <option value="Available">Available</option>
+              <option value="Occupied">Occupied</option>
+              <option value="Under Maintenance">Under Maintenance</option>
+            </select>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">All Rooms</div></div>
+            <div id="rooms-table"><div class="loading">Loading...</div></div>
+          </div>
+        </div>
+
+        <!-- MY BOOKINGS -->
+        <div id="view-my-bookings" class="view">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">My Bookings</div></div>
+            <div id="my-bookings-table"><div class="loading">Loading...</div></div>
+          </div>
+        </div>
+
+        <!-- NEW BOOKING -->
+        <div id="view-new-booking" class="view">
+          <div class="panel" style="max-width:640px">
+            <div class="panel-header"><div class="panel-title">New Reservation</div></div>
+            <div class="modal-body">
+              <div class="info-box">Only <strong>Available</strong> rooms can be selected. Cost = price per night × number of nights. Payment must match total cost exactly.</div>
+              <div id="booking-alert" class="alert"></div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Check-in Date</label>
+                  <input type="date" id="b-checkIn" onchange="calcCost()" />
+                </div>
+                <div class="form-group">
+                  <label>Check-out Date</label>
+                  <input type="date" id="b-checkOut" onchange="calcCost()" />
+                </div>
+                <div class="form-group">
+                  <label>Number of Guests</label>
+                  <input type="number" id="b-numGuests" min="1" max="6" value="1" onchange="calcCost()" />
+                </div>
+                <div class="form-group">
+                  <label>Room</label>
+                  <select id="b-roomId" onchange="calcCost()">
+                    <option value="">— Select available room —</option>
+                  </select>
+                </div>
+              </div>
+              <div class="cost-preview" id="cost-preview">
+                <strong>Estimated Cost:</strong> <span id="cost-nights">–</span> night(s) × R<span id="cost-rate">–</span> = <strong>R<span id="cost-total">–</span></strong>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="createBooking()">Create Reservation</button>
+                <button class="btn btn-ghost" onclick="showView('dashboard')">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAYMENTS -->
+        <div id="view-payments" class="view">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title" id="payments-panel-title">Payments</div></div>
+            <div id="payments-table"><div class="loading">Loading...</div></div>
+          </div>
+        </div>
+
+        <!-- ALL RESERVATIONS (Staff only) -->
+        <div id="view-all-reservations" class="view">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">All Reservations</div></div>
+            <div id="all-reservations-table"><div class="loading">Loading...</div></div>
+          </div>
+        </div>
+
+        <!-- GUESTS (Staff only) -->
+        <div id="view-guests" class="view">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Registered Guests</div></div>
+            <div id="guests-table"><div class="loading">Loading...</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER MODAL -->
+<div class="modal-overlay" id="register-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Create Account</div>
+      <button class="modal-close" onclick="closeModal('register-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="reg-alert" class="alert"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>First Name</label><input type="text" id="reg-first" /></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="reg-last" /></div>
+        <div class="form-group"><label>Email</label><input type="email" id="reg-email" /></div>
+        <div class="form-group"><label>Phone</label><input type="text" id="reg-phone" /></div>
+        <div class="form-group"><label>Username</label><input type="text" id="reg-username" /></div>
+        <div class="form-group"><label>Password</label><input type="password" id="reg-password" /></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="doRegister()">Create Account</button>
+        <button class="btn btn-ghost" onclick="closeModal('register-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAY MODAL -->
+<div class="modal-overlay" id="pay-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Complete Payment</div>
+      <button class="modal-close" onclick="closeModal('pay-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="pay-alert" class="alert"></div>
+      <div class="info-box" id="pay-info"></div>
+      <input type="hidden" id="pay-res-id" />
+      <input type="hidden" id="pay-amount" />
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Payment Method</label>
+        <select id="pay-method">
+          <option value="">— Select method —</option>
+          <option value="Cash">Cash</option>
+          <option value="Credit Card">Credit Card</option>
+          <option value="Debit Card">Debit Card</option>
+          <option value="EFT">EFT</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-success" onclick="submitPayment()">Pay Now</button>
+        <button class="btn btn-ghost" onclick="closeModal('pay-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000/api';
+let currentUser = null;
+let isStaff = false;
+let staffPermissions = {};  
+let allRooms = [];
+let roomsData = [];
+
+// ─── Permission check helper ──────────────────────
+// Call can(permission) anywhere to check if the current user is allowed
+function can(permission) {
+  if (!isStaff) return false;
+  return staffPermissions[permission] === true;
+}
+
+// ─── Helpers ───────────────────────────────────────
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, { headers: {'Content-Type':'application/json'}, ...opts });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+function showAlert(id, msg, type = 'error') {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `alert alert-${type} show`;
+  setTimeout(() => el.className = 'alert', 5000);
+}
+
+function badge(status) {
+  const map = { Available:'available', Occupied:'occupied', 'Under Maintenance':'occupied',
+    Confirmed:'confirmed', Pending:'pending', Cancelled:'cancelled', Paid:'paid', Refunded:'refunded' };
+  return `<span class="badge badge-${map[status]||'pending'}">${status}</span>`;
+}
+
+function fmt(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-ZA', {day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ─── Auth ──────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!username || !password) return showAlert('login-alert', 'Please enter username and password');
+  try {
+    try {
+      const data = await apiFetch('/auth/login', { method:'POST', body:JSON.stringify({username,password}) });
+      currentUser = data.guest;
+      isStaff = false;
+      staffPermissions = {};
+      launchApp();
+      return;
+    } catch {}
+    const staffData = await apiFetch('/auth/staff-login', { method:'POST', body:JSON.stringify({username,password}) });
+    currentUser = staffData.staff;
+    isStaff = true;
+    
+    staffPermissions = staffData.staff.permissions || {};
+    launchApp();
+  } catch (err) {
+    showAlert('login-alert', 'Invalid username or password');
+  }
+}
+
+// ─── Build nav based on role permissions ──────────────────
+function buildNav() {
+  const nav = document.getElementById('main-nav');
+  nav.innerHTML = '';
+
+  // Everyone gets Dashboard
+  if (!isStaff) {
+    addNavItem(nav, 'dashboard',    '◈', 'Dashboard');
+    addNavItem(nav, 'rooms',        '⬡', 'Rooms');
+    addNavItem(nav, 'my-bookings',  '◻', 'My Bookings');
+    addNavItem(nav, 'new-booking',  '＋', 'New Booking');
+    addNavItem(nav, 'payments',     '◇', 'My Payments');
+    return;
+  }
+
+  // Staff — show a section header then only permitted items
+  addNavItem(nav, 'dashboard', '◈', 'Dashboard');
+
+  // Room status: Cleaner, Receptionist, Manager
+  if (can('manageRoomStatus')) {
+    addNavItem(nav, 'rooms', '⬡', 'Room Status');
+  }
+
+  // Reservations: Receptionist, Manager, Finance/Admin
+  if (can('viewAllReservations')) {
+    addNavItem(nav, 'all-reservations', '▦', 'All Reservations');
+  }
+
+  // Guests: Security, Receptionist, Manager
+  if (can('viewGuests')) {
+    addNavItem(nav, 'guests', '◎', 'Guests');
+  }
+
+  // Payments: Receptionist, Manager, Finance/Admin
+  if (can('viewPayments')) {
+    addNavItem(nav, 'payments', '◇', 'Payments');
+  }
+}
+
+function addNavItem(nav, view, icon, label) {
+  const div = document.createElement('div');
+  div.className = 'nav-item';
+  div.dataset.view = view;
+  div.innerHTML = `<span class="icon">${icon}</span> ${label}`;
+  div.onclick = () => showView(view);
+  nav.appendChild(div);
+}
+
+function launchApp() {
+  document.getElementById('sidebar-user').textContent =
+    currentUser.USERNAME || currentUser.STAFF_EMAIL?.split('@')[0] || currentUser.FIRST_NAME;
+  document.getElementById('sidebar-role').textContent =
+    isStaff ? `${currentUser.ROLE} · ${currentUser.DEPARTMENT}` : 'Guest';
+  document.getElementById('topbar-date').textContent =
+    new Date().toLocaleDateString('en-ZA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  buildNav();
+  loadDashboard();
+}
+
+function showRegister() { document.getElementById('register-modal').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+async function doRegister() {
+  const body = {
+    firstName: document.getElementById('reg-first').value.trim(),
+    lastName:  document.getElementById('reg-last').value.trim(),
+    email:     document.getElementById('reg-email').value.trim(),
+    phone:     document.getElementById('reg-phone').value.trim(),
+    username:  document.getElementById('reg-username').value.trim(),
+    password:  document.getElementById('reg-password').value,
+  };
+  if (!body.firstName || !body.email || !body.username || !body.password || !body.phone)
+    return showAlert('reg-alert', 'All fields required (phone is mandatory per system rules)');
+  try {
+    await apiFetch('/auth/register', { method:'POST', body:JSON.stringify(body) });
+    showAlert('reg-alert', 'Account created! You can now log in.', 'success');
+    setTimeout(() => closeModal('register-modal'), 2000);
+  } catch (err) { showAlert('reg-alert', err.message); }
+}
+
+function logout() {
+  currentUser = null; isStaff = false; staffPermissions = {};
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+}
+
+// ─── Navigation ────────────────────────────────────
+function showView(name) {
+   
+  if (isStaff) {
+    const gated = {
+      'payments':          'viewPayments',
+      'all-reservations':  'viewAllReservations',
+      'guests':            'viewGuests',
+      'rooms':             'manageRoomStatus',
+    };
+    if (gated[name] && !can(gated[name])) {
+      // Show access denied instead of the view
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const el = document.getElementById('view-dashboard');
+      if (el) el.classList.add('active');
+      document.getElementById('page-title').textContent = 'Access Denied';
+      document.getElementById('view-dashboard').innerHTML = `
+        <div class="access-denied">
+          <div class="icon">🔒</div>
+          <h3>You don't have permission to view this section</h3>
+          <p>Contact your manager if you think this is a mistake.</p>
+        </div>`;
+      return;
+    }
+  }
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('view-' + name);
+  if (el) el.classList.add('active');
+  const nav = document.querySelector(`[data-view="${name}"]`);
+  if (nav) nav.classList.add('active');
+  const titles = { dashboard:'Dashboard', rooms:'Room Status', 'my-bookings':'My Bookings',
+    'new-booking':'New Booking', payments:'Payments', 'all-reservations':'All Reservations', guests:'Guests' };
+  document.getElementById('page-title').textContent = titles[name] || name;
+  if (name === 'rooms') loadRooms();
+  if (name === 'my-bookings') loadMyBookings();
+  if (name === 'payments') loadPayments();
+  if (name === 'all-reservations') loadAllReservations();
+  if (name === 'guests') loadGuests();
+  if (name === 'new-booking') loadAvailableRooms();
+}
+
+// ─── Dashboard ─────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [rooms] = await Promise.all([apiFetch('/rooms')]);
+    const available = rooms.filter(r => r.STATUS === 'Available').length;
+    document.getElementById('stat-rooms').textContent = rooms.length;
+    document.getElementById('stat-available').textContent = available;
+
+    if (!isStaff) {
+      const myRes = await apiFetch(`/guests/${currentUser.GUEST_ID}/reservations`).catch(() => []);
+      const guests = await apiFetch('/guests').catch(() => []);
+      document.getElementById('stat-reservations').textContent = myRes.length;
+      document.getElementById('stat-guests').textContent = guests.length;
+      document.getElementById('dashboard-reservations').innerHTML = myRes.length ? `
+        <table><thead><tr><th>ID</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>${myRes.slice(0,5).map(r => `<tr>
+          <td style="color:#888;font-size:11px">${r.RESERVATION_ID}</td>
+          <td>${r.ROOM_NUMBER} · ${r.TYPE_NAME}</td>
+          <td>${fmt(r.CHECK_IN_DATE)}</td><td>${fmt(r.CHECK_OUT_DATE)}</td>
+          <td>R ${r.TOTAL_COST?.toLocaleString()}</td>
+          <td>${badge(r.PAYMENT_STATUS)}</td>
+          <td>${r.PAYMENT_STATUS === 'Pending' ? `<button class="btn btn-success btn-sm" onclick="openPayModal('${r.RESERVATION_ID}',${r.TOTAL_COST})">Pay</button>` : '—'}</td>
+        </tr>`).join('')}</tbody></table>`
+        : `<div class="empty">No bookings yet — make your first reservation!</div>`;
+    } else {
+      // Staff dashboard — show role-relevant summary
+      document.getElementById('stat-reservations').textContent = '—';
+      document.getElementById('stat-guests').textContent = '—';
+      document.getElementById('dashboard-reservations').innerHTML = `
+        <div style="padding:24px 20px;font-size:13px;color:#888">
+          Welcome back, <strong>${currentUser.FIRST_NAME}</strong>. 
+          Use the sidebar to navigate to your permitted sections.
+        </div>`;
+    }
+  } catch (err) {
+    document.getElementById('dashboard-reservations').innerHTML = `<div class="empty">Could not load — is the server running?</div>`;
+  }
+}
+
+// ─── Rooms ─────────────────────────────────────────
+async function loadRooms() {
+  try {
+    allRooms = await apiFetch('/rooms');
+    renderRooms(allRooms);
+  } catch { document.getElementById('rooms-table').innerHTML = `<div class="empty">Failed to load rooms</div>`; }
+}
+
+function renderRooms(rooms) {
+  const canManage = isStaff && can('manageRoomStatus');
+  document.getElementById('rooms-table').innerHTML = rooms.length ? `
+    <table><thead><tr><th>Room No.</th><th>Type</th><th>Beds</th><th>Floor</th><th>Capacity</th><th>Rate/Night</th><th>Rating</th><th>Status</th>${canManage ? '<th>Action</th>' : ''}</tr></thead>
+    <tbody>${rooms.map(r => `<tr>
+      <td><strong>${r.ROOM_NUMBER}</strong></td>
+      <td>${r.TYPE_NAME}</td><td>${r.BED_CONFIGURATION}</td><td>${r.LOCATION}</td>
+      <td>${r.MAX_OCCUPANCY} guest${r.MAX_OCCUPANCY>1?'s':''}</td>
+      <td>R ${r.PRICE_PER_NIGHT?.toLocaleString()}</td>
+      <td>⭐ ${r.RATING}</td>
+      <td>${badge(r.STATUS)}</td>
+      ${canManage ? `<td><select onchange="updateRoomStatus('${r.ROOM_ID}', this.value)" style="padding:4px 8px;font-size:11px;border-radius:4px;border:1px solid #ddd">
+        <option ${r.STATUS==='Available'?'selected':''}>Available</option>
+        <option ${r.STATUS==='Occupied'?'selected':''}>Occupied</option>
+        <option ${r.STATUS==='Under Maintenance'?'selected':''}>Under Maintenance</option>
+      </select></td>` : ''}
+    </tr>`).join('')}</tbody></table>` : `<div class="empty">No rooms found</div>`;
+}
+
+function filterRooms() {
+  const q = document.getElementById('room-search').value.toLowerCase();
+  const s = document.getElementById('room-status-filter').value;
+  renderRooms(allRooms.filter(r => (!s || r.STATUS === s) && (!q || r.ROOM_NUMBER.toLowerCase().includes(q) || r.TYPE_NAME.toLowerCase().includes(q))));
+}
+
+async function updateRoomStatus(id, status) {
+  try {
+    await apiFetch(`/rooms/${id}/status`, { method:'PATCH', body:JSON.stringify({status}) });
+  } catch (err) { alert(err.message); loadRooms(); }
+}
+
+// ─── My Bookings ───────────────────────────────────
+async function loadMyBookings() {
+  try {
+    const data = await apiFetch(`/guests/${currentUser.GUEST_ID}/reservations`);
+    document.getElementById('my-bookings-table').innerHTML = data.length ? `
+      <table><thead><tr><th>ID</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Guests</th><th>Total Cost</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${data.map(r => `<tr>
+        <td style="font-size:11px;color:#888">${r.RESERVATION_ID}</td>
+        <td>${r.ROOM_NUMBER} · ${r.TYPE_NAME}</td>
+        <td>${fmt(r.CHECK_IN_DATE)}</td><td>${fmt(r.CHECK_OUT_DATE)}</td>
+        <td>${r.NUMBER_OF_GUESTS}</td>
+        <td>R ${r.TOTAL_COST?.toLocaleString()}</td>
+        <td>${badge(r.PAYMENT_STATUS)}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          ${r.PAYMENT_STATUS === 'Pending' ? `<button class="btn btn-success btn-sm" onclick="openPayModal('${r.RESERVATION_ID}',${r.TOTAL_COST})">Pay</button>` : ''}
+          ${r.PAYMENT_STATUS === 'Pending' ? `<button class="btn btn-danger btn-sm" onclick="cancelMyRes('${r.RESERVATION_ID}')">Cancel</button>` : ''}
+        </td>
+      </tr>`).join('')}</tbody></table>` : `<div class="empty">You have no reservations yet</div>`;
+  } catch { document.getElementById('my-bookings-table').innerHTML = `<div class="empty">Failed to load</div>`; }
+}
+
+async function cancelMyRes(id) {
+  if (!confirm('Cancel this reservation? This cannot be undone.')) return;
+  try {
+    await apiFetch(`/reservations/${id}`, { method:'DELETE' });
+    loadMyBookings();
+    loadDashboard();
+  } catch (err) { alert(err.message); }
+}
+
+// ─── Payment Modal ─────────────────────────────────
+function openPayModal(resId, amount) {
+  document.getElementById('pay-res-id').value = resId;
+  document.getElementById('pay-amount').value = amount;
+  document.getElementById('pay-info').innerHTML = `Reservation <strong>${resId}</strong> — Amount due: <strong>R${Number(amount).toLocaleString()}</strong><br>Payment amount must match exactly.`;
+  document.getElementById('pay-method').value = '';
+  document.getElementById('pay-modal').classList.add('open');
+}
+
+async function submitPayment() {
+  const resId = document.getElementById('pay-res-id').value;
+  const amount = document.getElementById('pay-amount').value;
+  const method = document.getElementById('pay-method').value;
+  if (!method) return showAlert('pay-alert', 'Please select a payment method');
+  try {
+    const res = await apiFetch('/payments', { method:'POST', body:JSON.stringify({reservationId:resId, amount:Number(amount), paymentMethod:method}) });
+    showAlert('pay-alert', res.message, 'success');
+    setTimeout(() => { closeModal('pay-modal'); loadMyBookings(); loadDashboard(); }, 1500);
+  } catch (err) { showAlert('pay-alert', err.message); }
+}
+
+// ─── All Reservations (Staff) ──────────────────────
+async function loadAllReservations() {
+ 
+  if (!can('viewAllReservations')) return;
+  try {
+    const data = await apiFetch('/reservations');
+    document.getElementById('all-reservations-table').innerHTML = data.length ? `
+      <table><thead><tr><th>ID</th><th>Guest</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${data.map(r => `<tr>
+        <td style="font-size:11px;color:#888">${r.RESERVATION_ID}</td>
+        <td>${r.GUEST_NAME}</td>
+        <td>${r.ROOM_NUMBER} · ${r.TYPE_NAME}</td>
+        <td>${fmt(r.CHECK_IN_DATE)}</td><td>${fmt(r.CHECK_OUT_DATE)}</td>
+        <td>R ${r.TOTAL_COST?.toLocaleString()}</td>
+        <td>${badge(r.PAYMENT_STATUS)}</td>
+        <td style="display:flex;gap:6px">
+          ${r.PAYMENT_STATUS==='Pending' && can('manageReservations') ? `<button class="btn btn-danger btn-sm" onclick="staffCancelRes('${r.RESERVATION_ID}')">Cancel</button>` : '—'}
+        </td>
+      </tr>`).join('')}</tbody></table>` : `<div class="empty">No reservations</div>`;
+  } catch { document.getElementById('all-reservations-table').innerHTML = `<div class="empty">Failed to load</div>`; }
+}
+
+async function staffCancelRes(id) {
+  if (!confirm('Cancel this reservation?')) return;
+  try { await apiFetch(`/reservations/${id}`, {method:'DELETE'}); loadAllReservations(); } catch(e){ alert(e.message); }
+}
+
+// ─── Guests (Staff) ────────────────────────────────
+async function loadGuests() {
+  if (!can('viewGuests')) return;
+  try {
+    const data = await apiFetch('/guests');
+    document.getElementById('guests-table').innerHTML = data.length ? `
+      <table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Username</th></tr></thead>
+      <tbody>${data.map(g => `<tr>
+        <td style="font-size:11px;color:#888">${g.GUEST_ID}</td>
+        <td>${g.FIRST_NAME} ${g.LAST_NAME}</td>
+        <td>${g.EMAIL}</td><td>${g.PHONE_NUMBER||'—'}</td>
+        <td style="color:#888">${g.USERNAME}</td>
+      </tr>`).join('')}</tbody></table>` : `<div class="empty">No guests registered</div>`;
+  } catch { document.getElementById('guests-table').innerHTML = `<div class="empty">Failed to load</div>`; }
+}
+
+// ─── Payments ──────────────────────────────────────
+async function loadPayments() {
+  
+  if (isStaff && !can('viewPayments')) return;
+  try {
+    const data = await apiFetch('/payments');
+    
+    const filtered = isStaff ? data : data.filter(p => p.GUEST_NAME === `${currentUser.FIRST_NAME} ${currentUser.LAST_NAME}`);
+    document.getElementById('payments-panel-title').textContent = isStaff ? 'All Payments' : 'My Payments';
+    document.getElementById('payments-table').innerHTML = filtered.length ? `
+      <table><thead><tr><th>ID</th><th>Reservation</th>${isStaff?'<th>Guest</th>':''}<th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>${filtered.map(p => `<tr>
+        <td style="font-size:11px;color:#888">${p.PAYMENT_ID}</td>
+        <td>${p.RESERVATION_ID}</td>
+        ${isStaff ? `<td>${p.GUEST_NAME}</td>` : ''}
+        <td>R ${p.AMOUNT?.toLocaleString()}</td>
+        <td>${p.PAYMENT_METHOD}</td>
+        <td>${fmt(p.PAYMENT_DATE)}</td>
+        <td>${badge(p.PAYMENT_STATUS)}</td>
+        <td>${p.PAYMENT_STATUS==='Paid' && can('processRefunds') ? `<button class="btn btn-ghost btn-sm" onclick="requestRefund('${p.PAYMENT_ID}')">Refund</button>` : '—'}</td>
+      </tr>`).join('')}</tbody></table>` : `<div class="empty">No payment records found</div>`;
+  } catch { document.getElementById('payments-table').innerHTML = `<div class="empty">Failed to load</div>`; }
+}
+
+async function requestRefund(payId) {
+  if (!can('processRefunds')) return alert('You do not have permission to process refunds.');
+  if (!confirm('Request a refund for this payment? Reservation must be Cancelled first.')) return;
+  try {
+    const res = await apiFetch(`/payments/${payId}/refund`, {method:'POST'});
+    alert(res.message);
+    loadPayments();
+  } catch (err) { alert(err.message); }
+}
+
+// ─── New Booking ───────────────────────────────────
+async function loadAvailableRooms() {
+  try {
+    roomsData = await apiFetch('/rooms/available');
+    const sel = document.getElementById('b-roomId');
+    sel.innerHTML = '<option value="">— Select available room —</option>' +
+      roomsData.map(r => `<option value="${r.ROOM_ID}" data-price="${r.PRICE_PER_NIGHT}" data-cap="${r.MAX_OCCUPANCY}">Room ${r.ROOM_NUMBER} — ${r.TYPE_NAME} (R${r.PRICE_PER_NIGHT}/night · max ${r.MAX_OCCUPANCY})</option>`).join('');
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('b-checkIn').min = today;
+    document.getElementById('b-checkOut').min = today;
+  } catch {}
+}
+
+function calcCost() {
+  const checkIn = document.getElementById('b-checkIn').value;
+  const checkOut = document.getElementById('b-checkOut').value;
+  const roomSel = document.getElementById('b-roomId');
+  const numGuests = Number(document.getElementById('b-numGuests').value);
+  const preview = document.getElementById('cost-preview');
+  const selected = roomSel.options[roomSel.selectedIndex];
+
+  if (checkIn && checkOut && selected?.dataset?.price) {
+    const nights = Math.ceil((new Date(checkOut) - new Date(checkIn)) / 86400000);
+    const rate = Number(selected.dataset.price);
+    const cap = Number(selected.dataset.cap);
+    if (nights > 0) {
+      document.getElementById('cost-nights').textContent = nights;
+      document.getElementById('cost-rate').textContent = rate.toLocaleString();
+      document.getElementById('cost-total').textContent = (nights * rate).toLocaleString();
+      preview.classList.add('show');
+      if (numGuests > cap) showAlert('booking-alert', `This room fits max ${cap} guest(s)`);
+    }
+  } else {
+    preview.classList.remove('show');
+  }
+}
+
+async function createBooking() {
+  const checkIn   = document.getElementById('b-checkIn').value;
+  const checkOut  = document.getElementById('b-checkOut').value;
+  const roomId    = document.getElementById('b-roomId').value;
+  const numGuests = Number(document.getElementById('b-numGuests').value);
+
+  if (!checkIn || !checkOut || !roomId || !numGuests)
+    return showAlert('booking-alert', 'Please fill in all fields');
+  if (new Date(checkOut) <= new Date(checkIn))
+    return showAlert('booking-alert', 'Check-out must be after check-in');
+  if (numGuests < 1)
+    return showAlert('booking-alert', 'Number of guests must be at least 1');
+
+  try {
+    const res = await apiFetch('/reservations', {
+      method:'POST',
+      body:JSON.stringify({ guestId:currentUser.GUEST_ID, roomId, checkIn, checkOut, numGuests })
+    });
+    showAlert('booking-alert', `✓ Reservation ${res.reservationId} created! Total: R${res.totalCost?.toLocaleString()} for ${res.nights} night(s). Go to My Bookings to pay.`, 'success');
+    loadAvailableRooms();
+  } catch (err) { showAlert('booking-alert', err.message); }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
+});
+</script>
+</body>
+</html>
